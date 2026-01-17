@@ -405,17 +405,145 @@ using these ip addresses, look up where they came from geographically, and then 
             </div>
         </div>
 
-        <!-- Placeholder for future reports -->
-        <div class="report-section" style="opacity: 0.5;">
+        <!-- Vulnerability Dashboard Report -->
+        <div class="report-section">
             <div class="report-header">
-                <h2>📊 Future Reports</h2>
-                <p>Prompts will be documented here as new reports are generated</p>
+                <h2>📊 Vulnerability Dashboard</h2>
+                <p>Generated: January 17, 2026 | File: vulnerability_dashboard.html</p>
             </div>
+
             <div class="prompt-card" style="border-radius: 0 0 10px 10px;">
+                <div class="prompt-header">
+                    <h3>
+                        <span class="prompt-number">1</span>
+                        Single Comprehensive Prompt
+                    </h3>
+                </div>
                 <div class="prompt-content">
-                    <p style="text-align: center; color: rgba(255, 255, 255, 0.6);">
-                        Additional reports such as Vulnerability Dashboards, Library Security Analysis, and Route Coverage Reports will be documented here as they are created.
-                    </p>
+                    <div class="prompt-meta">
+                        <span class="meta-badge">🔍 MCP Tool: search_vulnerabilities</span>
+                        <span class="meta-badge">📊 Data Source: contrastmcp-eval-cargo-cats</span>
+                        <span class="meta-badge">📈 Visualization: Chart.js</span>
+                    </div>
+
+                    <div class="prompt-description">
+                        <strong>Purpose:</strong> Generate a comprehensive vulnerability dashboard showing all security issues across applications, organized by severity with interactive charts and detailed breakdowns.
+                    </div>
+
+                    <div class="prompt-box">
+                        <span class="prompt-label">USER PROMPT</span>
+based on the index.html page that was created, create the vulnerability dashboard using contrast cargo cats mcp server for data
+                    </div>
+
+                    <div class="output-info">
+                        <h4>📤 Output Generated:</h4>
+                        <ul>
+                            <li>24 total vulnerabilities identified (1 Critical, 3 High, 17 Medium, 3 Low)</li>
+                            <li>Interactive doughnut chart showing severity distribution</li>
+                            <li>Stacked bar chart displaying vulnerabilities by application</li>
+                            <li>Detailed vulnerability cards for Critical and High severity issues</li>
+                            <li>Application breakdown section showing vuln counts per app</li>
+                            <li>Color-coded severity indicators and hover animations</li>
+                            <li>Highlighted CRITICAL SQL Injection in cargo-cats-dataservice</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Library Security Report -->
+        <div class="report-section">
+            <div class="report-header">
+                <h2>🔒 Library Security Report</h2>
+                <p>Generated: January 17, 2026 | File: library_security.html</p>
+            </div>
+
+            <div class="prompt-card" style="border-radius: 0 0 10px 10px;">
+                <div class="prompt-header">
+                    <h3>
+                        <span class="prompt-number">1</span>
+                        Single Comprehensive Prompt
+                    </h3>
+                </div>
+                <div class="prompt-content">
+                    <div class="prompt-meta">
+                        <span class="meta-badge">🔍 MCP Tool: list_application_libraries</span>
+                        <span class="meta-badge">📊 Data Source: contrastmcp-eval-cargo-cats</span>
+                        <span class="meta-badge">📈 Features: Risk Meters, CVE Details</span>
+                    </div>
+
+                    <div class="prompt-description">
+                        <strong>Purpose:</strong> Generate a comprehensive library security analysis showing third-party dependencies with known CVEs, security grades, and remediation priorities.
+                    </div>
+
+                    <div class="prompt-box">
+                        <span class="prompt-label">USER PROMPT</span>
+based on the index.html page that was created, create the library security report using contrast cargo cats mcp server for data
+                    </div>
+
+                    <div class="output-info">
+                        <h4>📤 Output Generated:</h4>
+                        <ul>
+                            <li>127 total libraries analyzed across applications</li>
+                            <li>85 libraries with known CVEs (67%)</li>
+                            <li>243 total CVEs identified with 38 CRITICAL vulnerabilities</li>
+                            <li>Detailed cards for Log4Shell, Spring4Shell, SnakeYAML, Commons Collections</li>
+                            <li>Interactive filter buttons (All, Critical, 30+ months outdated, F-grade)</li>
+                            <li>Animated risk meters showing threat levels</li>
+                            <li>Priority remediation plan with 3 urgency levels</li>
+                            <li>Security grade distribution (A through F)</li>
+                            <li>Collapsible CVE details with descriptions and severity codes</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Route Coverage Analysis Report -->
+        <div class="report-section">
+            <div class="report-header">
+                <h2>📈 Route Coverage Analysis</h2>
+                <p>Generated: January 17, 2026 | File: route_coverage.html</p>
+            </div>
+
+            <div class="prompt-card" style="border-radius: 0 0 10px 10px;">
+                <div class="prompt-header">
+                    <h3>
+                        <span class="prompt-number">1</span>
+                        Single Comprehensive Prompt
+                    </h3>
+                </div>
+                <div class="prompt-content">
+                    <div class="prompt-meta">
+                        <span class="meta-badge">🔍 MCP Tool: get_route_coverage</span>
+                        <span class="meta-badge">📊 Data Source: contrastmcp-eval-cargo-cats</span>
+                        <span class="meta-badge">📈 Visualization: Chart.js Progress Bars</span>
+                    </div>
+
+                    <div class="prompt-description">
+                        <strong>Purpose:</strong> Generate a route coverage analysis showing which API endpoints have been exercised versus discovered, with vulnerability tracking and coverage metrics.
+                    </div>
+
+                    <div class="prompt-box">
+                        <span class="prompt-label">USER PROMPT</span>
+based on the index.html page that was created, create the route coverage analysis using contrast cargo cats mcp server for data
+                    </div>
+
+                    <div class="output-info">
+                        <h4>📤 Output Generated:</h4>
+                        <ul>
+                            <li>181 total routes analyzed across 12 applications</li>
+                            <li>110 exercised routes (60.77% average coverage)</li>
+                            <li>71 discovered but not yet exercised routes</li>
+                            <li>Doughnut chart showing exercised vs discovered distribution</li>
+                            <li>Stacked bar chart comparing routes by application</li>
+                            <li>12 application cards with detailed coverage metrics</li>
+                            <li>Color-coded coverage levels (green: 100%, orange: 50-66%, red: 21%)</li>
+                            <li>Security alerts for CRITICAL SQL Injection in exercised route</li>
+                            <li>Visual progress bars showing exercised/discovered ratio</li>
+                            <li>Key insights highlighting best performers and security findings</li>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>
