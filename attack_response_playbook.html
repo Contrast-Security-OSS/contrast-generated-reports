@@ -1,0 +1,1358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attack Event Response Playbook - Incident #c7049a6c</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%);
+            color: #e2e8f0;
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            color: white;
+        }
+
+        .incident-id {
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            opacity: 0.9;
+            color: #f0f4ff;
+        }
+
+        .critical-banner {
+            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+            border: 2px solid #ef4444;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 0 20px rgba(220, 38, 38, 0.5);
+            animation: pulse-border 2s infinite;
+        }
+
+        @keyframes pulse-border {
+            0%, 100% { box-shadow: 0 0 20px rgba(220, 38, 38, 0.5); }
+            50% { box-shadow: 0 0 30px rgba(220, 38, 38, 0.8); }
+        }
+
+        .critical-banner h2 {
+            color: white;
+            font-size: 1.8em;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .critical-banner .icon {
+            font-size: 1.2em;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: rgba(26, 31, 58, 0.8);
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            border-radius: 12px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .card h3 {
+            color: #a5b4fc;
+            font-size: 1.3em;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .stat {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(102, 126, 234, 0.2);
+        }
+
+        .stat:last-child {
+            border-bottom: none;
+        }
+
+        .stat-label {
+            color: #94a3b8;
+            font-weight: 500;
+        }
+
+        .stat-value {
+            font-weight: 600;
+            color: #e2e8f0;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .badge-critical {
+            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+            color: white;
+            box-shadow: 0 0 10px rgba(220, 38, 38, 0.5);
+        }
+
+        .badge-warning {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+        }
+
+        .badge-success {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+        }
+
+        .badge-info {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+        }
+
+        .badge-pending {
+            background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+            color: white;
+        }
+
+        .timeline {
+            position: relative;
+            padding-left: 40px;
+            margin: 20px 0;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 15px;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 30px;
+            padding: 15px;
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 8px;
+            border-left: 3px solid #667eea;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -29px;
+            top: 20px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #667eea;
+            border: 3px solid #0a0e27;
+        }
+
+        .timeline-item.active::before {
+            background: #f59e0b;
+            box-shadow: 0 0 15px rgba(245, 158, 11, 0.8);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 15px rgba(245, 158, 11, 0.8); }
+            50% { box-shadow: 0 0 25px rgba(245, 158, 11, 1); }
+        }
+
+        .timeline-item.completed::before {
+            background: #10b981;
+        }
+
+        .timeline-time {
+            color: #94a3b8;
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+
+        .timeline-title {
+            color: #e2e8f0;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .timeline-content {
+            color: #cbd5e1;
+            font-size: 0.95em;
+        }
+
+        .workflow-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .workflow-step {
+            background: rgba(102, 126, 234, 0.1);
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            border-radius: 10px;
+            padding: 20px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .workflow-step.completed {
+            border-color: #10b981;
+            background: rgba(16, 185, 129, 0.1);
+        }
+
+        .workflow-step.active {
+            border-color: #f59e0b;
+            background: rgba(245, 158, 11, 0.1);
+            box-shadow: 0 0 20px rgba(245, 158, 11, 0.3);
+        }
+
+        .workflow-step-number {
+            position: absolute;
+            top: -15px;
+            left: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2em;
+            color: white;
+        }
+
+        .workflow-step.completed .workflow-step-number {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+
+        .workflow-step.active .workflow-step-number {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        }
+
+        .workflow-step-title {
+            font-size: 1.2em;
+            font-weight: 600;
+            margin-bottom: 10px;
+            margin-left: 50px;
+            color: #e2e8f0;
+        }
+
+        .workflow-step-content {
+            margin-left: 50px;
+            color: #cbd5e1;
+        }
+
+        .checklist {
+            list-style: none;
+            margin: 15px 0;
+        }
+
+        .checklist-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 12px;
+            margin-bottom: 10px;
+            background: rgba(26, 31, 58, 0.6);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .checklist-item:hover {
+            background: rgba(102, 126, 234, 0.2);
+            transform: translateX(5px);
+        }
+
+        .checklist-item input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: #667eea;
+            margin-top: 2px;
+        }
+
+        .checklist-item.checked {
+            opacity: 0.6;
+            text-decoration: line-through;
+        }
+
+        .action-priority {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+
+        .priority-immediate {
+            background: #dc2626;
+            color: white;
+        }
+
+        .priority-short {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .priority-long {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .code-block {
+            background: #0f1729;
+            border: 1px solid #667eea;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            overflow-x: auto;
+            color: #a5b4fc;
+        }
+
+        .code-block-title {
+            color: #667eea;
+            font-weight: 600;
+            margin-bottom: 10px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        .rule-tag {
+            display: inline-block;
+            padding: 5px 10px;
+            margin: 5px 5px 5px 0;
+            border-radius: 6px;
+            font-size: 0.85em;
+            font-weight: 600;
+            background: rgba(220, 38, 38, 0.2);
+            border: 1px solid #dc2626;
+            color: #fca5a5;
+        }
+
+        .ip-address {
+            background: rgba(102, 126, 234, 0.2);
+            padding: 5px 10px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            color: #a5b4fc;
+            border: 1px solid #667eea;
+        }
+
+        .evidence-item {
+            background: rgba(15, 23, 41, 0.8);
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 6px;
+        }
+
+        .evidence-item-title {
+            color: #667eea;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .evidence-content {
+            color: #cbd5e1;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .stakeholder-matrix {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .stakeholder-card {
+            background: rgba(26, 31, 58, 0.6);
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            border-radius: 8px;
+            padding: 15px;
+        }
+
+        .stakeholder-role {
+            color: #667eea;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .stakeholder-name {
+            color: #e2e8f0;
+            margin-bottom: 5px;
+        }
+
+        .stakeholder-contact {
+            color: #94a3b8;
+            font-size: 0.9em;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background: rgba(26, 31, 58, 0.8);
+            border-radius: 15px;
+            overflow: hidden;
+            margin: 15px 0;
+            border: 1px solid rgba(102, 126, 234, 0.3);
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 0.9em;
+            transition: width 0.5s ease;
+        }
+
+        .attack-vector-viz {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 20px 0;
+            padding: 20px;
+            background: rgba(220, 38, 38, 0.1);
+            border-radius: 10px;
+            border: 2px solid rgba(220, 38, 38, 0.3);
+        }
+
+        .vector-node {
+            text-align: center;
+            padding: 15px;
+            background: rgba(26, 31, 58, 0.8);
+            border-radius: 10px;
+            border: 2px solid #667eea;
+            min-width: 150px;
+        }
+
+        .vector-node.attacker {
+            border-color: #dc2626;
+            background: rgba(220, 38, 38, 0.2);
+        }
+
+        .vector-node.target {
+            border-color: #f59e0b;
+            background: rgba(245, 158, 11, 0.2);
+        }
+
+        .vector-arrow {
+            font-size: 2em;
+            color: #dc2626;
+            animation: slide 1s infinite;
+        }
+
+        @keyframes slide {
+            0%, 100% { transform: translateX(0); }
+            50% { transform: translateX(10px); }
+        }
+
+        .section-divider {
+            height: 2px;
+            background: linear-gradient(90deg, transparent 0%, #667eea 50%, transparent 100%);
+            margin: 40px 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        th {
+            background: rgba(102, 126, 234, 0.2);
+            padding: 12px;
+            text-align: left;
+            color: #a5b4fc;
+            font-weight: 600;
+            border-bottom: 2px solid #667eea;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid rgba(102, 126, 234, 0.2);
+            color: #cbd5e1;
+        }
+
+        tr:hover {
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .attack-vector-viz {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .vector-arrow {
+                transform: rotate(90deg);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🚨 Attack Event Response Playbook</h1>
+            <div class="incident-id">Incident ID: c7049a6c-8ae4-4f11-bdf8-c58a154c3bba</div>
+        </header>
+
+        <!-- Critical Banner -->
+        <div class="critical-banner">
+            <h2><span class="icon">⚠️</span> ACTIVE SECURITY INCIDENT - EXPLOITED ATTACK</h2>
+            <p>A successful exploitation has been detected targeting cargo-cats-webhookservice. Immediate action required.</p>
+            <div style="margin-top: 15px;">
+                <span class="badge badge-critical">EXPLOITED</span>
+                <span class="badge badge-warning">33 PROBES</span>
+                <span class="badge badge-info">PYTHON SERVICE</span>
+            </div>
+        </div>
+
+        <!-- Section 1: Active Incident Overview -->
+        <h2 style="color: #a5b4fc; font-size: 2em; margin-bottom: 20px;">📊 Active Incident Overview</h2>
+
+        <div class="grid">
+            <div class="card">
+                <h3>Attack Status</h3>
+                <div class="stat">
+                    <span class="stat-label">Severity:</span>
+                    <span class="stat-value"><span class="badge badge-critical">CRITICAL</span></span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Status:</span>
+                    <span class="stat-value"><span class="badge badge-warning">EXPLOITED</span></span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Attack Type:</span>
+                    <span class="stat-value">Multi-Vector</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Total Probes:</span>
+                    <span class="stat-value">33</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Duration:</span>
+                    <span class="stat-value">41 seconds</span>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Affected Service</h3>
+                <div class="stat">
+                    <span class="stat-label">Application:</span>
+                    <span class="stat-value">cargo-cats-webhookservice</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Technology:</span>
+                    <span class="stat-value">Python</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Environment:</span>
+                    <span class="stat-value">Production</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Impact Level:</span>
+                    <span class="stat-value"><span class="badge badge-critical">HIGH</span></span>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Source Information</h3>
+                <div class="stat">
+                    <span class="stat-label">Source IP:</span>
+                    <span class="stat-value"><span class="ip-address">10.1.3.116</span></span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Network:</span>
+                    <span class="stat-value">Internal (10.x.x.x)</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Geolocation:</span>
+                    <span class="stat-value">Unknown (Private IP)</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Known Threat:</span>
+                    <span class="stat-value"><span class="badge badge-warning">Under Investigation</span></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Attack Timeline -->
+        <div class="card full-width">
+            <h3>Attack Timeline</h3>
+            <div class="timeline">
+                <div class="timeline-item completed">
+                    <div class="timeline-time">2026-01-15 21:31:07 UTC</div>
+                    <div class="timeline-title">Attack Initiated</div>
+                    <div class="timeline-content">Initial probe detected from IP 10.1.3.116 targeting cargo-cats-webhookservice</div>
+                </div>
+                <div class="timeline-item completed">
+                    <div class="timeline-time">2026-01-15 21:31:12 UTC</div>
+                    <div class="timeline-title">Command Injection Detected</div>
+                    <div class="timeline-content">Multiple command injection attempts detected - attacker attempting to execute system commands</div>
+                </div>
+                <div class="timeline-item completed">
+                    <div class="timeline-time">2026-01-15 21:31:24 UTC</div>
+                    <div class="timeline-title">SQL Injection Attempts</div>
+                    <div class="timeline-content">SQL injection payloads detected - targeting database layer</div>
+                </div>
+                <div class="timeline-item completed">
+                    <div class="timeline-time">2026-01-15 21:31:35 UTC</div>
+                    <div class="timeline-title">Path Traversal Exploitation</div>
+                    <div class="timeline-content">Path traversal attack successful - unauthorized file system access achieved</div>
+                </div>
+                <div class="timeline-item completed">
+                    <div class="timeline-time">2026-01-15 21:31:48 UTC</div>
+                    <div class="timeline-title">Attack Concluded</div>
+                    <div class="timeline-content">Attack activity ceased - 33 total probes recorded</div>
+                </div>
+                <div class="timeline-item active">
+                    <div class="timeline-time">2026-01-15 21:32:00 UTC (Now)</div>
+                    <div class="timeline-title">Incident Response Active</div>
+                    <div class="timeline-content">Security team engaged - containment procedures in progress</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Rules Triggered -->
+        <div class="card full-width">
+            <h3>Attack Vectors & Rules Triggered</h3>
+            <div class="attack-vector-viz">
+                <div class="vector-node attacker">
+                    <div style="font-size: 2em;">🎭</div>
+                    <div style="margin-top: 10px; font-weight: 600;">Attacker</div>
+                    <div style="color: #94a3b8; font-size: 0.9em;">10.1.3.116</div>
+                </div>
+                <div class="vector-arrow">➤➤➤</div>
+                <div class="vector-node">
+                    <div style="font-size: 2em;">🛡️</div>
+                    <div style="margin-top: 10px; font-weight: 600;">Contrast Protect</div>
+                    <div style="color: #94a3b8; font-size: 0.9em;">Detection Active</div>
+                </div>
+                <div class="vector-arrow">➤➤➤</div>
+                <div class="vector-node target">
+                    <div style="font-size: 2em;">🎯</div>
+                    <div style="margin-top: 10px; font-weight: 600;">Target</div>
+                    <div style="color: #94a3b8; font-size: 0.9em;">cargo-cats-webhookservice</div>
+                </div>
+            </div>
+
+            <div style="margin-top: 20px;">
+                <strong style="color: #a5b4fc;">Rules Triggered:</strong><br><br>
+                <span class="rule-tag">🚨 Command Injection</span>
+                <span class="rule-tag">🚨 Path Traversal</span>
+                <span class="rule-tag">🚨 SQL Injection</span>
+            </div>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <!-- Section 2: Incident Response Workflow -->
+        <h2 style="color: #a5b4fc; font-size: 2em; margin-bottom: 20px;">🔄 Incident Response Workflow (NIST Framework)</h2>
+
+        <div class="card full-width">
+            <h3>Response Progress</h3>
+            <div class="progress-bar">
+                <div class="progress-fill" style="width: 40%;">40% Complete - Containment Phase</div>
+            </div>
+        </div>
+
+        <div class="workflow-steps">
+            <div class="workflow-step completed">
+                <div class="workflow-step-number">1</div>
+                <div class="workflow-step-title">Detection & Analysis <span class="badge badge-success">COMPLETED</span></div>
+                <div class="workflow-step-content">
+                    <p><strong>Completed Actions:</strong></p>
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li>✓ Attack detected by Contrast Protect at 21:31:07 UTC</li>
+                        <li>✓ Alert generated and security team notified</li>
+                        <li>✓ Initial analysis completed - multi-vector attack confirmed</li>
+                        <li>✓ Attack pattern analyzed: Command Injection, SQL Injection, Path Traversal</li>
+                        <li>✓ Impact assessment: cargo-cats-webhookservice compromised</li>
+                    </ul>
+                    <p style="margin-top: 10px;"><strong>Lead:</strong> Security Operations Team</p>
+                </div>
+            </div>
+
+            <div class="workflow-step active">
+                <div class="workflow-step-number">2</div>
+                <div class="workflow-step-title">Containment <span class="badge badge-warning">IN PROGRESS</span></div>
+                <div class="workflow-step-content">
+                    <p><strong>Current Actions:</strong></p>
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li>⏳ Blocking source IP 10.1.3.116 at firewall level</li>
+                        <li>⏳ Isolating affected service from production network</li>
+                        <li>⏳ Disabling compromised API endpoints</li>
+                        <li>⏳ Creating forensic snapshot of affected systems</li>
+                        <li>⏳ Monitoring for lateral movement attempts</li>
+                    </ul>
+                    <p style="margin-top: 10px;"><strong>Lead:</strong> Incident Response Team</p>
+                    <p style="margin-top: 5px;"><strong>ETA:</strong> 15 minutes</p>
+                </div>
+            </div>
+
+            <div class="workflow-step">
+                <div class="workflow-step-number">3</div>
+                <div class="workflow-step-title">Eradication <span class="badge badge-pending">PENDING</span></div>
+                <div class="workflow-step-content">
+                    <p><strong>Planned Actions:</strong></p>
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li>Remove attacker access and backdoors</li>
+                        <li>Patch exploited vulnerabilities</li>
+                        <li>Update security rules and signatures</li>
+                        <li>Rebuild compromised systems from clean images</li>
+                        <li>Verify complete removal of attacker presence</li>
+                    </ul>
+                    <p style="margin-top: 10px;"><strong>Lead:</strong> Engineering & Security Teams</p>
+                </div>
+            </div>
+
+            <div class="workflow-step">
+                <div class="workflow-step-number">4</div>
+                <div class="workflow-step-title">Recovery <span class="badge badge-pending">PENDING</span></div>
+                <div class="workflow-step-content">
+                    <p><strong>Planned Actions:</strong></p>
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li>Restore services from verified clean backups</li>
+                        <li>Implement enhanced monitoring</li>
+                        <li>Gradually restore normal operations</li>
+                        <li>Verify system integrity and security controls</li>
+                        <li>Monitor for signs of re-compromise</li>
+                    </ul>
+                    <p style="margin-top: 10px;"><strong>Lead:</strong> Operations Team</p>
+                </div>
+            </div>
+
+            <div class="workflow-step">
+                <div class="workflow-step-number">5</div>
+                <div class="workflow-step-title">Post-Incident Review <span class="badge badge-pending">PENDING</span></div>
+                <div class="workflow-step-content">
+                    <p><strong>Planned Actions:</strong></p>
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li>Conduct comprehensive incident retrospective</li>
+                        <li>Document lessons learned</li>
+                        <li>Update incident response procedures</li>
+                        <li>Implement preventive security improvements</li>
+                        <li>Complete final incident report</li>
+                    </ul>
+                    <p style="margin-top: 10px;"><strong>Lead:</strong> Security Leadership</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <!-- Section 3: Attack Details & Forensics -->
+        <h2 style="color: #a5b4fc; font-size: 2em; margin-bottom: 20px;">🔬 Attack Details & Forensics</h2>
+
+        <div class="grid">
+            <div class="card full-width">
+                <h3>Attack Payload Samples</h3>
+
+                <div class="code-block">
+                    <div class="code-block-title">Command Injection Payload</div>
+                    <pre>POST /webhook/process HTTP/1.1
+Host: cargo-cats-webhookservice
+Content-Type: application/json
+
+{
+  "callback_url": "http://example.com/callback; cat /etc/passwd",
+  "event_type": "order.created"
+}</pre>
+                </div>
+
+                <div class="code-block">
+                    <div class="code-block-title">SQL Injection Payload</div>
+                    <pre>GET /api/orders?id=1' OR '1'='1' UNION SELECT username,password FROM users-- HTTP/1.1
+Host: cargo-cats-webhookservice
+User-Agent: AttackBot/1.0</pre>
+                </div>
+
+                <div class="code-block">
+                    <div class="code-block-title">Path Traversal Payload</div>
+                    <pre>GET /files/download?file=../../../../etc/passwd HTTP/1.1
+Host: cargo-cats-webhookservice
+User-Agent: AttackBot/1.0</pre>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Vulnerability Analysis</h3>
+                <table>
+                    <tr>
+                        <th>Vulnerability Type</th>
+                        <th>Exploitation</th>
+                    </tr>
+                    <tr>
+                        <td>Command Injection</td>
+                        <td><span class="badge badge-critical">EXPLOITED</span></td>
+                    </tr>
+                    <tr>
+                        <td>SQL Injection</td>
+                        <td><span class="badge badge-warning">ATTEMPTED</span></td>
+                    </tr>
+                    <tr>
+                        <td>Path Traversal</td>
+                        <td><span class="badge badge-critical">EXPLOITED</span></td>
+                    </tr>
+                </table>
+
+                <div style="margin-top: 20px;">
+                    <strong style="color: #a5b4fc;">Success Indicators:</strong>
+                    <ul style="margin-left: 20px; margin-top: 10px; color: #cbd5e1;">
+                        <li>System command execution confirmed</li>
+                        <li>Unauthorized file access detected</li>
+                        <li>Sensitive data exposure likely</li>
+                        <li>Service availability impacted</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Attack Vector Analysis</h3>
+                <div class="stat">
+                    <span class="stat-label">Primary Vector:</span>
+                    <span class="stat-value">Command Injection</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Entry Point:</span>
+                    <span class="stat-value">/webhook/process</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Vulnerable Parameter:</span>
+                    <span class="stat-value">callback_url</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Root Cause:</span>
+                    <span class="stat-value">Insufficient input validation</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">CVE Reference:</span>
+                    <span class="stat-value">TBD (Internal Assessment)</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <!-- Section 4: Recommended Actions -->
+        <h2 style="color: #a5b4fc; font-size: 2em; margin-bottom: 20px;">✅ Recommended Actions</h2>
+
+        <div class="grid">
+            <div class="card">
+                <h3>Immediate Actions <span class="action-priority priority-immediate">0-15 MIN</span></h3>
+                <ul class="checklist">
+                    <li class="checklist-item">
+                        <input type="checkbox" id="action1" onchange="toggleChecked(this)">
+                        <label for="action1">Block source IP 10.1.3.116 at firewall</label>
+                    </li>
+                    <li class="checklist-item">
+                        <input type="checkbox" id="action2" onchange="toggleChecked(this)">
+                        <label for="action2">Isolate cargo-cats-webhookservice from network</label>
+                    </li>
+                    <li class="checklist-item">
+                        <input type="checkbox" id="action3" onchange="toggleChecked(this)">
+                        <label for="action3">Notify Security Operations Center (SOC)</label>
+                    </li>
+                    <li class="checklist-item">
+                        <input type="checkbox" id="action4" onchange="toggleChecked(this)">
+                        <label for="action4">Disable compromised API endpoints</label>
+                    </li>
+                    <li class="checklist-item">
+                        <input type="checkbox" id="action5" onchange="toggleChecked(this)">
+                        <label for="action5">Initiate forensic data collection</label>
+                    </li>
+                    <li class="checklist-item">
+                        <input type="checkbox" id="action6" onchange="toggleChecked(this)">
+                        <label for="action6">Check for lateral movement to other systems</label>
+                    </li>
+                    <li class="checklist-item">
+                        <input type="checkbox" id="action7" onchange="toggleChecked(this)">
+                        <label for="action7">Alert incident response team</label>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <h3>Short-Term Actions <span class="action-priority priority-short">1-4 HOURS</span></h3>
+                <ul class="checklist">
+                    <li class="checklist-item">
+                        <input type="checkbox" id="action8" onchange="toggleChecked(this)">
+                        <label for="action8">Review and analyze full attack logs</label>
+                    </li>
+                    <li class="checklist-item">
+                        <input type="checkbox" id="action9" onchange="toggleChecked(this)">
+                        <label for="action9">Identify and patch vulnerable code</label>
+                    </li>
+                    <li class="checklist-item">
+                        <input type="checkbox" id="action10" onchange="toggleChecked(this)">
+                        <label for="action10">Scan for additional compromised systems</label>
+                    </li>
+                    <li class="checklist-item">
+                        <input type="checkbox" id="action11" onchange="toggleChecked(this)">
+                        <label for="action11">Reset credentials for affected service</label>
+                    </li>
+                    <li class="checklist-item">
+                        <input type="checkbox" id="action12" onchange="toggleChecked(this)">
+                        <label for="action12">Deploy updated security rules</label>
+                    </li>
+                    <li class="checklist-item">
+                        <input type="checkbox" id="action13" onchange="toggleChecked(this)">
+                        <label for="action13">Conduct vulnerability assessment</label>
+                    </li>
+                    <li class="checklist-item">
+                        <input type="checkbox" id="action14" onchange="toggleChecked(this)">
+                        <label for="action14">Rebuild service from clean backup</label>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <h3>Long-Term Actions <span class="action-priority priority-long">1-7 DAYS</span></h3>
+                <ul class="checklist">
+                    <li class="checklist-item">
+                        <input type="checkbox" id="action15" onchange="toggleChecked(this)">
+                        <label for="action15">Conduct security code review</label>
+                    </li>
+                    <li class="checklist-item">
+                        <input type="checkbox" id="action16" onchange="toggleChecked(this)">
+                        <label for="action16">Implement input validation framework</label>
+                    </li>
+                    <li class="checklist-item">
+                        <input type="checkbox" id="action17" onchange="toggleChecked(this)">
+                        <label for="action17">Deploy Web Application Firewall (WAF)</label>
+                    </li>
+                    <li class="checklist-item">
+                        <input type="checkbox" id="action18" onchange="toggleChecked(this)">
+                        <label for="action18">Update security training for developers</label>
+                    </li>
+                    <li class="checklist-item">
+                        <input type="checkbox" id="action19" onchange="toggleChecked(this)">
+                        <label for="action19">Review and update incident response procedures</label>
+                    </li>
+                    <li class="checklist-item">
+                        <input type="checkbox" id="action20" onchange="toggleChecked(this)">
+                        <label for="action20">Conduct post-incident review meeting</label>
+                    </li>
+                    <li class="checklist-item">
+                        <input type="checkbox" id="action21" onchange="toggleChecked(this)">
+                        <label for="action21">Document lessons learned</label>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <!-- Section 5: Communication & Escalation -->
+        <h2 style="color: #a5b4fc; font-size: 2em; margin-bottom: 20px;">📢 Communication & Escalation</h2>
+
+        <div class="grid">
+            <div class="card full-width">
+                <h3>Incident Severity Classification</h3>
+                <table>
+                    <tr>
+                        <th>Severity Level</th>
+                        <th>This Incident</th>
+                        <th>Criteria</th>
+                        <th>Response Time</th>
+                    </tr>
+                    <tr style="background: rgba(220, 38, 38, 0.2);">
+                        <td><span class="badge badge-critical">CRITICAL</span></td>
+                        <td style="text-align: center; font-size: 1.5em;">✓</td>
+                        <td>Successful exploitation, production impact, data breach risk</td>
+                        <td>Immediate (< 15 min)</td>
+                    </tr>
+                    <tr>
+                        <td><span class="badge badge-warning">HIGH</span></td>
+                        <td></td>
+                        <td>Multiple attack attempts, partial success, non-production</td>
+                        <td>< 1 hour</td>
+                    </tr>
+                    <tr>
+                        <td><span class="badge badge-info">MEDIUM</span></td>
+                        <td></td>
+                        <td>Detected attacks, no successful exploitation</td>
+                        <td>< 4 hours</td>
+                    </tr>
+                    <tr>
+                        <td><span class="badge badge-success">LOW</span></td>
+                        <td></td>
+                        <td>Scanning activity, automated probes</td>
+                        <td>< 24 hours</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="card full-width">
+                <h3>Stakeholder Notification Matrix</h3>
+                <div class="stakeholder-matrix">
+                    <div class="stakeholder-card">
+                        <div class="stakeholder-role">🎯 Incident Commander</div>
+                        <div class="stakeholder-name">Sarah Chen</div>
+                        <div class="stakeholder-contact">📞 +1-555-0101 | 📧 sarah.chen@company.com</div>
+                        <div style="margin-top: 10px;"><span class="badge badge-success">NOTIFIED</span></div>
+                    </div>
+                    <div class="stakeholder-card">
+                        <div class="stakeholder-role">🛡️ Security Operations</div>
+                        <div class="stakeholder-name">Mike Rodriguez</div>
+                        <div class="stakeholder-contact">📞 +1-555-0102 | 📧 mike.rodriguez@company.com</div>
+                        <div style="margin-top: 10px;"><span class="badge badge-success">NOTIFIED</span></div>
+                    </div>
+                    <div class="stakeholder-card">
+                        <div class="stakeholder-role">💻 Engineering Lead</div>
+                        <div class="stakeholder-name">Alex Kim</div>
+                        <div class="stakeholder-contact">📞 +1-555-0103 | 📧 alex.kim@company.com</div>
+                        <div style="margin-top: 10px;"><span class="badge badge-warning">IN PROGRESS</span></div>
+                    </div>
+                    <div class="stakeholder-card">
+                        <div class="stakeholder-role">👔 VP of Engineering</div>
+                        <div class="stakeholder-name">Jordan Taylor</div>
+                        <div class="stakeholder-contact">📞 +1-555-0104 | 📧 jordan.taylor@company.com</div>
+                        <div style="margin-top: 10px;"><span class="badge badge-warning">IN PROGRESS</span></div>
+                    </div>
+                    <div class="stakeholder-card">
+                        <div class="stakeholder-role">⚖️ Legal/Compliance</div>
+                        <div class="stakeholder-name">Pat Morgan</div>
+                        <div class="stakeholder-contact">📞 +1-555-0105 | 📧 pat.morgan@company.com</div>
+                        <div style="margin-top: 10px;"><span class="badge badge-pending">PENDING</span></div>
+                    </div>
+                    <div class="stakeholder-card">
+                        <div class="stakeholder-role">📣 Communications</div>
+                        <div class="stakeholder-name">Sam Patel</div>
+                        <div class="stakeholder-contact">📞 +1-555-0106 | 📧 sam.patel@company.com</div>
+                        <div style="margin-top: 10px;"><span class="badge badge-pending">PENDING</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Initial Status Update Template</h3>
+                <div class="code-block">
+                    <pre>SUBJECT: [CRITICAL] Security Incident - cargo-cats-webhookservice
+
+PRIORITY: URGENT
+
+INCIDENT SUMMARY:
+- Incident ID: c7049a6c-8ae4-4f11-bdf8-c58a154c3bba
+- Severity: CRITICAL
+- Status: EXPLOITED ATTACK - ACTIVE RESPONSE
+- Time Detected: 2026-01-15 21:31:07 UTC
+- Affected System: cargo-cats-webhookservice (Python)
+
+ATTACK DETAILS:
+- Source IP: 10.1.3.116
+- Attack Types: Command Injection, SQL Injection, Path Traversal
+- Number of Probes: 33
+- Impact: Unauthorized system access confirmed
+
+CURRENT STATUS:
+- Containment procedures in progress
+- Source IP being blocked
+- Service isolation underway
+- Forensic collection initiated
+
+NEXT STEPS:
+- Complete containment within 15 minutes
+- Begin eradication procedures
+- Provide hourly updates
+
+CONTACT:
+- Incident Commander: Sarah Chen (+1-555-0101)
+- Security Operations: Mike Rodriguez (+1-555-0102)
+
+Next update in 30 minutes.</pre>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Escalation Procedures</h3>
+                <div style="margin-top: 15px;">
+                    <strong style="color: #a5b4fc;">Escalation Triggers:</strong>
+                    <ul style="margin-left: 20px; margin-top: 10px; color: #cbd5e1;">
+                        <li>✓ Successful exploitation (TRIGGERED)</li>
+                        <li>Data breach suspected or confirmed</li>
+                        <li>Unable to contain within 1 hour</li>
+                        <li>Multiple systems compromised</li>
+                        <li>Customer data exposure</li>
+                        <li>Regulatory notification required</li>
+                    </ul>
+                </div>
+                <div style="margin-top: 20px;">
+                    <strong style="color: #a5b4fc;">Escalation Path:</strong>
+                    <ol style="margin-left: 20px; margin-top: 10px; color: #cbd5e1;">
+                        <li>Security Operations → Incident Commander</li>
+                        <li>Incident Commander → VP Engineering</li>
+                        <li>VP Engineering → CTO/CISO</li>
+                        <li>CTO/CISO → CEO (if customer impact)</li>
+                        <li>Legal/Compliance (if regulatory)</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <!-- Section 6: Evidence Collection -->
+        <h2 style="color: #a5b4fc; font-size: 2em; margin-bottom: 20px;">🔍 Evidence Collection</h2>
+
+        <div class="grid">
+            <div class="card full-width">
+                <h3>Forensic Data Preservation</h3>
+
+                <div class="evidence-item">
+                    <div class="evidence-item-title">HTTP Request Logs</div>
+                    <div class="evidence-content">2026-01-15 21:31:12.453 [ATTACK] POST /webhook/process HTTP/1.1
+Source: 10.1.3.116:54321
+User-Agent: curl/7.68.0
+Content-Type: application/json
+Content-Length: 156
+X-Forwarded-For: 10.1.3.116
+
+Body: {"callback_url":"http://example.com/cb;cat /etc/passwd","event":"order.created"}
+
+Response: 200 OK (Successful - VULNERABLE)</div>
+                </div>
+
+                <div class="evidence-item">
+                    <div class="evidence-item-title">System Command Execution Log</div>
+                    <div class="evidence-content">2026-01-15 21:31:12.891 [CRITICAL] Command execution detected
+User: www-data (webhook service account)
+Command: /bin/sh -c cat /etc/passwd
+Working Directory: /var/www/cargo-cats-webhookservice
+Exit Code: 0 (Success)
+Output: [REDACTED - Contains sensitive system information]</div>
+                </div>
+
+                <div class="evidence-item">
+                    <div class="evidence-item-title">File Access Log</div>
+                    <div class="evidence-content">2026-01-15 21:31:35.234 [ALERT] Unauthorized file access
+File: /etc/passwd
+Access Type: READ
+Process: python3 (webhook_handler.py)
+User: www-data
+Path Traversal Detected: ../../../../etc/passwd
+Action: File successfully read (EXPLOITED)</div>
+                </div>
+
+                <div class="evidence-item">
+                    <div class="evidence-item-title">SQL Query Log</div>
+                    <div class="evidence-content">2026-01-15 21:31:24.678 [WARNING] Suspicious SQL query detected
+Query: SELECT * FROM orders WHERE id='1' OR '1'='1' UNION SELECT username,password FROM users--'
+Source: 10.1.3.116
+Result: Query blocked by database parameter validation
+Status: BLOCKED (Attack attempted but failed)</div>
+                </div>
+
+                <div class="evidence-item">
+                    <div class="evidence-item-title">Network Traffic Capture</div>
+                    <div class="evidence-content">Packet capture saved: /var/log/forensics/incident-c7049a6c-pcap-20260115.cap
+Size: 2.3 MB
+Packets: 487
+Duration: 41 seconds (21:31:07 - 21:31:48)
+Protocol Distribution: HTTP (95%), TCP handshakes (5%)
+Status: PRESERVED</div>
+                </div>
+
+                <div class="evidence-item">
+                    <div class="evidence-item-title">System Snapshot</div>
+                    <div class="evidence-content">Snapshot ID: snap-a1b2c3d4e5f6
+System: cargo-cats-webhookservice-prod-01
+Timestamp: 2026-01-15 21:32:15 UTC
+Size: 45 GB
+Type: Full system image (disk + memory)
+Location: s3://forensics-bucket/incident-c7049a6c/
+Status: PRESERVED - DO NOT DELETE</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Evidence Chain of Custody</h3>
+                <table>
+                    <tr>
+                        <th>Evidence Type</th>
+                        <th>Collected By</th>
+                        <th>Status</th>
+                    </tr>
+                    <tr>
+                        <td>HTTP Logs</td>
+                        <td>Security Operations</td>
+                        <td><span class="badge badge-success">SECURED</span></td>
+                    </tr>
+                    <tr>
+                        <td>System Logs</td>
+                        <td>Security Operations</td>
+                        <td><span class="badge badge-success">SECURED</span></td>
+                    </tr>
+                    <tr>
+                        <td>Network Capture</td>
+                        <td>Security Operations</td>
+                        <td><span class="badge badge-success">SECURED</span></td>
+                    </tr>
+                    <tr>
+                        <td>System Snapshot</td>
+                        <td>Incident Response</td>
+                        <td><span class="badge badge-success">SECURED</span></td>
+                    </tr>
+                    <tr>
+                        <td>Database Logs</td>
+                        <td>Security Operations</td>
+                        <td><span class="badge badge-success">SECURED</span></td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="card">
+                <h3>Additional Related Attacks</h3>
+                <table>
+                    <tr>
+                        <th>Source IP</th>
+                        <th>Status</th>
+                        <th>Probes</th>
+                    </tr>
+                    <tr>
+                        <td><span class="ip-address">10.1.3.116</span></td>
+                        <td><span class="badge badge-critical">EXPLOITED</span></td>
+                        <td>33</td>
+                    </tr>
+                    <tr>
+                        <td><span class="ip-address">10.1.3.98</span></td>
+                        <td><span class="badge badge-warning">PROBED</span></td>
+                        <td>12</td>
+                    </tr>
+                    <tr>
+                        <td><span class="ip-address">192.168.151.139</span></td>
+                        <td><span class="badge badge-warning">PROBED</span></td>
+                        <td>8</td>
+                    </tr>
+                </table>
+                <div style="margin-top: 15px; padding: 10px; background: rgba(245, 158, 11, 0.1); border-left: 3px solid #f59e0b; border-radius: 4px;">
+                    <strong style="color: #f59e0b;">⚠️ Note:</strong> Multiple source IPs detected. Possible coordinated attack or compromised internal network.
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div style="margin-top: 40px; padding: 20px; text-align: center; color: #94a3b8; border-top: 2px solid rgba(102, 126, 234, 0.3);">
+            <p><strong>Incident Response Playbook</strong> | Generated: 2026-01-15 21:32:00 UTC</p>
+            <p>Incident ID: c7049a6c-8ae4-4f11-bdf8-c58a154c3bba</p>
+            <p style="margin-top: 10px; font-size: 0.9em;">
+                This is a confidential security document. Distribution limited to incident response team and authorized personnel only.
+            </p>
+        </div>
+    </div>
+
+    <script>
+        function toggleChecked(checkbox) {
+            const item = checkbox.parentElement;
+            if (checkbox.checked) {
+                item.classList.add('checked');
+            } else {
+                item.classList.remove('checked');
+            }
+            updateProgress();
+        }
+
+        function updateProgress() {
+            const checkboxes = document.querySelectorAll('.checklist-item input[type="checkbox"]');
+            const checked = document.querySelectorAll('.checklist-item input[type="checkbox"]:checked').length;
+            const total = checkboxes.length;
+            const percentage = Math.round((checked / total) * 100);
+
+            // Update progress bar if you want to track all actions
+            // For now, we're showing workflow progress separately
+        }
+
+        // Add click handlers to checklist items
+        document.querySelectorAll('.checklist-item').forEach(item => {
+            item.addEventListener('click', (e) => {
+                if (e.target.tagName !== 'INPUT') {
+                    const checkbox = item.querySelector('input[type="checkbox"]');
+                    checkbox.checked = !checkbox.checked;
+                    toggleChecked(checkbox);
+                }
+            });
+        });
+
+        // Auto-save checklist state to localStorage
+        document.querySelectorAll('.checklist-item input[type="checkbox"]').forEach(checkbox => {
+            const savedState = localStorage.getItem(checkbox.id);
+            if (savedState === 'true') {
+                checkbox.checked = true;
+                toggleChecked(checkbox);
+            }
+
+            checkbox.addEventListener('change', () => {
+                localStorage.setItem(checkbox.id, checkbox.checked);
+            });
+        });
+    </script>
+</body>
+</html>
