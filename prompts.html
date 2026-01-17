@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Report Generation Prompts - Contrast MCP Server</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%);
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            padding: 40px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 15px;
+            margin-bottom: 40px;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        header p {
+            font-size: 1.1em;
+            opacity: 0.95;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 30px;
+            color: #667eea;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .back-link:hover {
+            color: #764ba2;
+            transform: translateX(-5px);
+        }
+
+        .intro {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 40px;
+            border: 1px solid rgba(102, 126, 234, 0.3);
+        }
+
+        .intro h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .intro p {
+            line-height: 1.6;
+            margin-bottom: 10px;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .report-section {
+            margin-bottom: 50px;
+        }
+
+        .report-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px 30px;
+            border-radius: 10px 10px 0 0;
+            border: 2px solid #667eea;
+            border-bottom: none;
+        }
+
+        .report-header h2 {
+            font-size: 1.8em;
+            margin-bottom: 5px;
+        }
+
+        .report-header p {
+            opacity: 0.9;
+            font-size: 0.95em;
+        }
+
+        .prompt-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            border-top: none;
+            padding: 0;
+            margin-bottom: 0;
+        }
+
+        .prompt-card:last-child {
+            border-radius: 0 0 10px 10px;
+        }
+
+        .prompt-header {
+            background: rgba(102, 126, 234, 0.2);
+            padding: 15px 30px;
+            border-bottom: 1px solid rgba(102, 126, 234, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .prompt-header h3 {
+            color: #667eea;
+            font-size: 1.3em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .prompt-number {
+            background: #667eea;
+            color: #fff;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+
+        .prompt-content {
+            padding: 30px;
+        }
+
+        .prompt-meta {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .meta-badge {
+            background: rgba(102, 126, 234, 0.3);
+            padding: 6px 14px;
+            border-radius: 5px;
+            font-size: 0.85em;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .prompt-description {
+            background: rgba(102, 126, 234, 0.1);
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #667eea;
+        }
+
+        .prompt-description strong {
+            color: #667eea;
+        }
+
+        .prompt-box {
+            background: #0a0e27;
+            border: 1px solid rgba(102, 126, 234, 0.4);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            position: relative;
+            font-family: 'Courier New', monospace;
+            font-size: 0.95em;
+            line-height: 1.6;
+            color: #e0e0e0;
+        }
+
+        .prompt-label {
+            position: absolute;
+            top: -10px;
+            left: 15px;
+            background: #667eea;
+            color: #fff;
+            padding: 3px 10px;
+            border-radius: 4px;
+            font-size: 0.75em;
+            font-weight: bold;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .output-info {
+            background: rgba(0, 255, 136, 0.1);
+            border-left: 4px solid #00ff88;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .output-info h4 {
+            color: #00ff88;
+            margin-bottom: 10px;
+        }
+
+        .output-info ul {
+            margin-left: 20px;
+            line-height: 1.8;
+        }
+
+        .workflow-diagram {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px dashed rgba(102, 126, 234, 0.5);
+            border-radius: 10px;
+            padding: 25px;
+            margin: 30px 0;
+            text-align: center;
+        }
+
+        .workflow-step {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin: 5px;
+            font-size: 0.9em;
+        }
+
+        .workflow-arrow {
+            display: inline-block;
+            color: #667eea;
+            font-size: 1.5em;
+            margin: 0 10px;
+        }
+
+        .copy-button {
+            background: #667eea;
+            color: #fff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.85em;
+            transition: all 0.3s ease;
+        }
+
+        .copy-button:hover {
+            background: #764ba2;
+            transform: scale(1.05);
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: rgba(255, 255, 255, 0.6);
+            border-top: 1px solid rgba(102, 126, 234, 0.3);
+            margin-top: 40px;
+        }
+
+        footer a {
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        code {
+            background: rgba(102, 126, 234, 0.2);
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            color: #ffa500;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="index.html" class="back-link">← Back to Reports</a>
+
+        <header>
+            <h1>📝 Report Generation Prompts</h1>
+            <p>Behind the Scenes: The AI Prompts That Generated These Reports</p>
+        </header>
+
+        <section class="intro">
+            <h2>About This Documentation</h2>
+            <p>
+                This page documents the exact prompts used to generate each report in this repository. These prompts
+                were given to Claude (via Claude Code) which interfaced with the Contrast MCP Server to retrieve
+                security data and create interactive visualizations.
+            </p>
+            <p style="margin-top: 15px;">
+                Each report generation typically involves multiple steps: data retrieval, processing, visualization,
+                and deployment. The prompts below show the complete workflow from request to final output.
+            </p>
+        </section>
+
+        <!-- Attack Map Report -->
+        <div class="report-section">
+            <div class="report-header">
+                <h2>🗺️ Attack Map Visualization</h2>
+                <p>Generated: January 17, 2026 | File: attack_map.html</p>
+            </div>
+
+            <div class="prompt-card">
+                <div class="prompt-header">
+                    <h3>
+                        <span class="prompt-number">1</span>
+                        Data Retrieval Prompt
+                    </h3>
+                </div>
+                <div class="prompt-content">
+                    <div class="prompt-meta">
+                        <span class="meta-badge">🔍 MCP Tool: search_attacks</span>
+                        <span class="meta-badge">📊 Data Source: contrastmcp-eval-cargo-cats</span>
+                    </div>
+
+                    <div class="prompt-description">
+                        <strong>Purpose:</strong> Retrieve attack data from Contrast ADR (Attack Detection and Response) and compile a list of source IP addresses.
+                    </div>
+
+                    <div class="prompt-box">
+                        <span class="prompt-label">USER PROMPT</span>
+get me the attack data for each and supply me a list of ip addresses from which the attacks came from
+                    </div>
+
+                    <div class="output-info">
+                        <h4>📤 Output Generated:</h4>
+                        <ul>
+                            <li>8 total attacks identified (1 exploited, 7 probed)</li>
+                            <li>6 unique source IP addresses extracted</li>
+                            <li>Attack details including rules triggered, probe counts, severity levels</li>
+                            <li>Affected applications and timeframes</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="prompt-card">
+                <div class="prompt-header">
+                    <h3>
+                        <span class="prompt-number">2</span>
+                        Visualization Generation Prompt
+                    </h3>
+                </div>
+                <div class="prompt-content">
+                    <div class="prompt-meta">
+                        <span class="meta-badge">🎨 Output: HTML/CSS/JavaScript</span>
+                        <span class="meta-badge">🗺️ Library: Leaflet.js</span>
+                        <span class="meta-badge">🌐 Server: Python HTTP</span>
+                    </div>
+
+                    <div class="prompt-description">
+                        <strong>Purpose:</strong> Create an interactive geographic visualization showing attack sources, connection lines to the server, and detailed hover information.
+                    </div>
+
+                    <div class="prompt-box">
+                        <span class="prompt-label">USER PROMPT</span>
+using these ip addresses, look up where they came from geographically, and then create an html page, host it in a python server, open a browser to show it, but have a map of the US, pinpoint on the map where they came from and have connecting lines showing them attacking the server which is hosted in northeast indiana. make it so when hovering over the lines, it shows what kind of attack it is and whether or not it was exploited.
+                    </div>
+
+                    <div class="output-info">
+                        <h4>📤 Output Generated:</h4>
+                        <ul>
+                            <li>Interactive map using Leaflet.js with dark theme</li>
+                            <li>Server marker in Fort Wayne, Indiana (Northeast Indiana)</li>
+                            <li>6 attack source markers with color coding (red = exploited, orange = probed)</li>
+                            <li>Animated connection lines showing attack vectors</li>
+                            <li>Hover tooltips displaying attack details (IP, rules, status, probes)</li>
+                            <li>Legend explaining visualization elements</li>
+                            <li>Python HTTP server launched on port 8000</li>
+                            <li>Automatic browser launch to display the map</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="workflow-diagram">
+                <h3 style="color: #667eea; margin-bottom: 20px;">Generation Workflow</h3>
+                <div>
+                    <span class="workflow-step">1. User Request</span>
+                    <span class="workflow-arrow">→</span>
+                    <span class="workflow-step">2. Query Contrast MCP</span>
+                    <span class="workflow-arrow">→</span>
+                    <span class="workflow-step">3. Process Attack Data</span>
+                    <span class="workflow-arrow">→</span>
+                    <span class="workflow-step">4. Generate HTML/JS</span>
+                    <span class="workflow-arrow">→</span>
+                    <span class="workflow-step">5. Launch Server</span>
+                    <span class="workflow-arrow">→</span>
+                    <span class="workflow-step">6. Display Result</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Placeholder for future reports -->
+        <div class="report-section" style="opacity: 0.5;">
+            <div class="report-header">
+                <h2>📊 Future Reports</h2>
+                <p>Prompts will be documented here as new reports are generated</p>
+            </div>
+            <div class="prompt-card" style="border-radius: 0 0 10px 10px;">
+                <div class="prompt-content">
+                    <p style="text-align: center; color: rgba(255, 255, 255, 0.6);">
+                        Additional reports such as Vulnerability Dashboards, Library Security Analysis, and Route Coverage Reports will be documented here as they are created.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <section class="intro">
+            <h2>💡 Key Insights</h2>
+            <p>
+                <strong>Prompt Engineering:</strong> The prompts demonstrate natural language interaction with the MCP server.
+                No complex API calls or SQL queries were needed - just conversational requests.
+            </p>
+            <p style="margin-top: 15px;">
+                <strong>MCP Integration:</strong> The Contrast MCP Server seamlessly provides security data through standardized
+                tool interfaces, enabling AI to generate comprehensive security reports and visualizations.
+            </p>
+            <p style="margin-top: 15px;">
+                <strong>Multi-Step Workflows:</strong> Complex outputs like the attack map required multiple prompts - first
+                to retrieve data, then to create the visualization. This modular approach allows for flexible, iterative development.
+            </p>
+        </section>
+
+        <footer>
+            <p>Generated using Contrast Security MCP Server | <a href="https://www.contrastsecurity.com" target="_blank">contrastsecurity.com</a></p>
+            <p style="margin-top: 10px; font-size: 0.9em;"><a href="index.html">← Back to Reports</a></p>
+        </footer>
+    </div>
+
+    <script>
+        // Add copy functionality for prompt boxes (future enhancement)
+        document.querySelectorAll('.prompt-box').forEach(box => {
+            box.style.cursor = 'pointer';
+            box.title = 'Click to select text';
+        });
+    </script>
+</body>
+</html>
