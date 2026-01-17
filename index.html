@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contrast MCP Server - Generated Reports</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%);
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            padding: 40px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 15px;
+            margin-bottom: 40px;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        }
+
+        header h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        header p {
+            font-size: 1.2em;
+            opacity: 0.95;
+        }
+
+        .intro {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 40px;
+            border: 1px solid rgba(102, 126, 234, 0.3);
+        }
+
+        .intro h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .intro p {
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+
+        .reports-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .report-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 30px;
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .report-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .report-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.4);
+            border-color: #667eea;
+        }
+
+        .report-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+        }
+
+        .report-card h3 {
+            color: #667eea;
+            font-size: 1.5em;
+            margin-bottom: 10px;
+        }
+
+        .report-card p {
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .report-meta {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .meta-item {
+            background: rgba(102, 126, 234, 0.2);
+            padding: 5px 12px;
+            border-radius: 5px;
+            font-size: 0.9em;
+        }
+
+        .report-link {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            text-decoration: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .report-link:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5);
+        }
+
+        .capabilities {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 40px;
+            border: 1px solid rgba(102, 126, 234, 0.3);
+        }
+
+        .capabilities h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 2em;
+        }
+
+        .capabilities-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .capability-item {
+            background: rgba(102, 126, 234, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .capability-item strong {
+            color: #667eea;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: rgba(255, 255, 255, 0.6);
+            border-top: 1px solid rgba(102, 126, 234, 0.3);
+            margin-top: 40px;
+        }
+
+        .badge {
+            display: inline-block;
+            background: #ff4444;
+            color: #fff;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            font-weight: bold;
+            margin-left: 8px;
+        }
+
+        .badge.exploited {
+            background: #ff4444;
+        }
+
+        .badge.probed {
+            background: #ffaa00;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🛡️ Contrast MCP Server</h1>
+            <p>Generated Reports & Visualizations</p>
+        </header>
+
+        <section class="intro">
+            <h2>About This Repository</h2>
+            <p>
+                This repository showcases the capabilities of the Contrast Security MCP (Model Context Protocol) Server.
+                The reports and visualizations here are dynamically generated using real security data from Contrast Security's
+                platform, demonstrating the power of integrating security intelligence with AI-powered analysis.
+            </p>
+            <p>
+                Each report provides interactive insights into application security, vulnerability management, attack detection,
+                and more. These examples illustrate how the Contrast MCP Server can be leveraged to create custom security
+                dashboards and reporting solutions.
+            </p>
+        </section>
+
+        <section class="reports-grid">
+            <div class="report-card">
+                <div class="report-icon">🗺️</div>
+                <h3>Attack Map Visualization <span class="badge exploited">EXPLOITED</span></h3>
+                <p>
+                    Interactive geographic visualization of attack patterns targeting the Cargo Cats infrastructure.
+                    Shows real-time ADR (Attack Detection and Response) data with animated attack vectors connecting
+                    source IPs to server locations.
+                </p>
+                <div class="report-meta">
+                    <span class="meta-item">📊 8 Total Attacks</span>
+                    <span class="meta-item">🚨 1 Exploited</span>
+                    <span class="meta-item">🔍 7 Probed</span>
+                    <span class="meta-item">📍 6 Unique IPs</span>
+                </div>
+                <p style="font-size: 0.9em; margin-bottom: 15px;">
+                    <strong>Attack Types:</strong> SQL Injection, Command Injection, Path Traversal
+                </p>
+                <a href="attack_map.html" class="report-link">View Attack Map →</a>
+            </div>
+
+            <!-- Placeholder for future reports -->
+            <div class="report-card" style="opacity: 0.6;">
+                <div class="report-icon">📊</div>
+                <h3>Vulnerability Dashboard</h3>
+                <p>
+                    Comprehensive vulnerability analysis across all applications, showing severity distributions,
+                    trending issues, and remediation status.
+                </p>
+                <div class="report-meta">
+                    <span class="meta-item">Coming Soon</span>
+                </div>
+                <a href="#" class="report-link" style="opacity: 0.5; cursor: not-allowed;">Coming Soon</a>
+            </div>
+
+            <div class="report-card" style="opacity: 0.6;">
+                <div class="report-icon">🔒</div>
+                <h3>Library Security Report</h3>
+                <p>
+                    Analysis of third-party libraries and dependencies, highlighting known CVEs and
+                    usage statistics to prioritize remediation efforts.
+                </p>
+                <div class="report-meta">
+                    <span class="meta-item">Coming Soon</span>
+                </div>
+                <a href="#" class="report-link" style="opacity: 0.5; cursor: not-allowed;">Coming Soon</a>
+            </div>
+
+            <div class="report-card" style="opacity: 0.6;">
+                <div class="report-icon">📈</div>
+                <h3>Route Coverage Analysis</h3>
+                <p>
+                    Detailed breakdown of API endpoint coverage showing exercised vs. discovered routes
+                    across all microservices in the application stack.
+                </p>
+                <div class="report-meta">
+                    <span class="meta-item">Coming Soon</span>
+                </div>
+                <a href="#" class="report-link" style="opacity: 0.5; cursor: not-allowed;">Coming Soon</a>
+            </div>
+        </section>
+
+        <section class="capabilities">
+            <h2>Contrast MCP Server Capabilities</h2>
+            <div class="capabilities-list">
+                <div class="capability-item">
+                    <strong>🔍 Application Search</strong><br>
+                    Query and filter applications by name, tags, and metadata
+                </div>
+                <div class="capability-item">
+                    <strong>🚨 Attack Detection</strong><br>
+                    Real-time ADR attack data with filtering and analysis
+                </div>
+                <div class="capability-item">
+                    <strong>🐛 Vulnerability Management</strong><br>
+                    Organization and app-level vulnerability searches
+                </div>
+                <div class="capability-item">
+                    <strong>📊 Route Coverage</strong><br>
+                    API endpoint discovery and exercise tracking
+                </div>
+                <div class="capability-item">
+                    <strong>📚 Library Analysis</strong><br>
+                    Third-party dependency tracking and CVE mapping
+                </div>
+                <div class="capability-item">
+                    <strong>🛡️ Protection Rules</strong><br>
+                    View and analyze Protect/ADR rule configurations
+                </div>
+                <div class="capability-item">
+                    <strong>🔬 SAST Scanning</strong><br>
+                    Static analysis results in SARIF format
+                </div>
+                <div class="capability-item">
+                    <strong>📋 Session Metadata</strong><br>
+                    Filter by build IDs, branches, and custom metadata
+                </div>
+            </div>
+        </section>
+
+        <footer>
+            <p>Generated using Contrast Security MCP Server | <a href="https://www.contrastsecurity.com" target="_blank" style="color: #667eea;">contrastsecurity.com</a></p>
+            <p style="margin-top: 10px; font-size: 0.9em;">Repository: contrast-generated-reports</p>
+        </footer>
+    </div>
+</body>
+</html>
