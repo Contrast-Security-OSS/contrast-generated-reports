@@ -1028,6 +1028,357 @@
     </div>
 
     <script>
+        // Configuration - Update these values with your Contrast Security credentials
+        const CONFIG = {
+            contrastUrl: 'https://eval.contrastsecurity.com/Contrast',
+            orgId: '545a3bce-97c5-4732-af38-1ac459087b0a',
+            appId: '14c302ab-f99c-473e-a869-5171663dcab1',
+            apiKey: '16s58pRXBJrIYcn9hQO9v7g3kU4Jf02o',
+            serviceKey: '0JWTRJY3994AMHTY',
+            username: 'jason.easterday@contrastsecurity.com'
+        };
+
+        // Create Basic Auth header
+        function getAuthHeader() {
+            const credentials = btoa(`${CONFIG.username}:${CONFIG.serviceKey}`);
+            return {
+                'Authorization': credentials,
+                'API-Key': CONFIG.apiKey,
+                'Accept': 'application/json'
+            };
+        }
+
+        // Fetch libraries from Contrast API
+        async function fetchLibraries() {
+            try {
+                // Check if we're running from a local server (localhost) or file://
+                const isLocalServer = window.location.protocol === 'http:' || window.location.protocol === 'https:';
+
+                let url, headers;
+
+                if (isLocalServer && window.location.hostname === 'localhost') {
+                    // Use proxy server for localhost
+                    url = `/api/contrast/api/ng/${CONFIG.orgId}/applications/${CONFIG.appId}/libraries?expand=vulns&quickFilter=ALL`;
+                    headers = {}; // Proxy handles auth
+                } else {
+                    // Direct API call (may have CORS issues from file://)
+                    url = `${CONFIG.contrastUrl}/api/ng/${CONFIG.orgId}/applications/${CONFIG.appId}/libraries?expand=vulns&quickFilter=ALL`;
+                    headers = getAuthHeader();
+                }
+
+                const response = await fetch(url, {
+                    method: 'GET',
+                    headers: headers
+                });
+
+                if (!response.ok) {
+                    throw new Error(`API call failed: ${response.status} ${response.statusText}`);
+                }
+
+                const data = await response.json();
+                return data.libraries || [];
+            } catch (error) {
+                console.error('Error fetching libraries:', error);
+                // Silently fail and return empty array - check console for details
+                return [];
+            }
+        }
+
+        // Calculate statistics from library data
+        function calculateStats(libraries) {
+            const stats = {
+                total: libraries.length,
+                withCVEs: 0,
+                totalCVEs: 0,
+                criticalVulns: 0,
+                grades: { A: 0, B: 0, C: 0, D: 0, F: 0 },
+                avgAge: 0,
+                totalAge: 0
+            };
+
+            libraries.forEach(lib => {
+                if (lib.totalVulnerabilities > 0) {
+                    stats.withCVEs++;
+                    stats.totalCVEs += lib.totalVulnerabilities;
+                }
+
+                // Count critical vulnerabilities
+                if (lib.vulnerabilities) {
+                    lib.vulnerabilities.forEach(vuln => {
+                        if (vuln.severityCode === 'CRITICAL') {
+                            stats.criticalVulns++;
+                        }
+                    });
+                }
+
+                // Count grades
+                if (lib.grade) {
+                    stats.grades[lib.grade] = (stats.grades[lib.grade] || 0) + 1;
+                }
+
+                // Calculate age in months
+                if (lib.latestReleaseDate && lib.releaseDate) {
+                    const ageMs = lib.latestReleaseDate - lib.releaseDate;
+                    const ageMonths = Math.floor(ageMs / (1000 * 60 * 60 * 24 * 30));
+                    stats.totalAge += ageMonths;
+                }
+            });
+
+            stats.avgAge = stats.total > 0 ? Math.floor(stats.totalAge / stats.total) : 0;
+            return stats;
+        }
+
+        // Get severity badge HTML
+        function getSeverityBadge(severity, count) {
+            const severityClass = severity.toLowerCase();
+            return `<span class="badge badge-${severityClass}">${count} ${severity}</span>`;
+        }
+
+        // Calculate risk percentage based on vulnerabilities and age
+        function calculateRisk(lib) {
+            let risk = 0;
+
+            // CVE severity weight
+            if (lib.vulnerabilities) {
+                lib.vulnerabilities.forEach(vuln => {
+                    if (vuln.severityCode === 'CRITICAL') risk += 25;
+                    else if (vuln.severityCode === 'HIGH') risk += 10;
+                    else if (vuln.severityCode === 'MEDIUM') risk += 5;
+                    else risk += 2;
+                });
+            }
+
+            // Age weight
+            if (lib.latestReleaseDate && lib.releaseDate) {
+                const ageMs = lib.latestReleaseDate - lib.releaseDate;
+                const ageMonths = Math.floor(ageMs / (1000 * 60 * 60 * 24 * 30));
+                risk += Math.min(ageMonths * 0.5, 30);
+            }
+
+            // Grade weight
+            const gradeWeight = { F: 15, D: 10, C: 5, B: 2, A: 0 };
+            risk += gradeWeight[lib.grade] || 0;
+
+            return Math.min(Math.floor(risk), 100);
+        }
+
+        // Count vulnerabilities by severity
+        function countVulnsBySeverity(vulns) {
+            const counts = { CRITICAL: 0, HIGH: 0, MEDIUM: 0, LOW: 0, NOTE: 0 };
+            if (vulns) {
+                vulns.forEach(vuln => {
+                    counts[vuln.severityCode] = (counts[vuln.severityCode] || 0) + 1;
+                });
+            }
+            return counts;
+        }
+
+        // Create library card HTML
+        function createLibraryCard(lib) {
+            const vulnCounts = countVulnsBySeverity(lib.vulnerabilities);
+            const risk = calculateRisk(lib);
+            const hasCritical = vulnCounts.CRITICAL > 0;
+            let ageMonths = 0;
+            if (lib.latestReleaseDate && lib.releaseDate) {
+                const ageMs = lib.latestReleaseDate - lib.releaseDate;
+                ageMonths = Math.floor(ageMs / (1000 * 60 * 60 * 24 * 30));
+            }
+
+            let vulnBadges = '';
+            if (vulnCounts.CRITICAL > 0) vulnBadges += getSeverityBadge('CRITICAL', vulnCounts.CRITICAL);
+            if (vulnCounts.HIGH > 0) vulnBadges += getSeverityBadge('HIGH', vulnCounts.HIGH);
+            if (vulnCounts.MEDIUM > 0) vulnBadges += getSeverityBadge('MEDIUM', vulnCounts.MEDIUM);
+
+            let cveListHtml = '';
+            if (lib.vulnerabilities && lib.vulnerabilities.length > 0) {
+                const displayVulns = lib.vulnerabilities.slice(0, 3); // Show first 3
+                const remaining = lib.vulnerabilities.length - 3;
+
+                cveListHtml = '<div class="cve-list"><h4 style="color: #ff4444; margin-bottom: 15px;">Known CVEs (' + lib.vulnerabilities.length + ' total)</h4>';
+
+                displayVulns.forEach(vuln => {
+                    cveListHtml += `
+                        <div class="cve-item">
+                            <div class="cve-id">${vuln.name}</div>
+                            <div class="cve-description">
+                                <strong>Severity: ${vuln.severityCode}</strong><br>
+                                ${vuln.description ? vuln.description.substring(0, 300) + '...' : 'No description available'}
+                            </div>
+                        </div>
+                    `;
+                });
+
+                if (remaining > 0) {
+                    cveListHtml += `<div style="margin-top: 10px; color: rgba(255, 255, 255, 0.7);"><em>+ ${remaining} additional CVEs</em></div>`;
+                }
+
+                cveListHtml += `
+                    <div style="margin-top: 15px; padding: 10px; background: rgba(255, 68, 68, 0.2); border-radius: 5px;">
+                        <strong>Remediation:</strong> Upgrade to ${lib.filename} version ${lib.latestVersion} or later.
+                    </div>
+                </div>`;
+            }
+
+            return `
+                <div class="library-card" data-severity="${hasCritical ? 'critical' : 'normal'}" data-grade="${lib.grade.toLowerCase()}" data-months="${ageMonths}">
+                    <div class="library-header">
+                        <div>
+                            <div class="library-name">${lib.filename.replace(/\.[^/.]+$/, "")}</div>
+                            <div class="library-version">Version: ${lib.version}</div>
+                        </div>
+                        <div>
+                            ${hasCritical ? '<span class="badge badge-critical">CRITICAL</span>' : ''}
+                            ${ageMonths >= 30 ? '<span class="badge badge-outdated">' + ageMonths + ' Months Old</span>' : ''}
+                            <span class="badge" style="background: ${lib.grade === 'F' ? '#ff4444' : lib.grade === 'D' ? '#ff6600' : lib.grade === 'C' ? '#ffaa00' : '#88ff00'}; color: ${lib.grade === 'A' || lib.grade === 'B' ? '#000' : '#fff'};">Grade: ${lib.grade}</span>
+                        </div>
+                    </div>
+                    ${vulnBadges ? '<div style="margin-bottom: 15px;">' + vulnBadges + '</div>' : ''}
+                    <div class="risk-meter">
+                        <div class="risk-fill" style="width: ${risk}%;">Risk: ${risk}%</div>
+                    </div>
+                    ${cveListHtml}
+                </div>
+            `;
+        }
+
+        // Create table row HTML
+        function createTableRow(lib) {
+            const vulnCounts = countVulnsBySeverity(lib.vulnerabilities);
+            let ageMonths = 0;
+            if (lib.latestReleaseDate && lib.releaseDate) {
+                const ageMs = lib.latestReleaseDate - lib.releaseDate;
+                ageMonths = Math.floor(ageMs / (1000 * 60 * 60 * 24 * 30));
+            }
+            const risk = calculateRisk(lib);
+
+            let vulnBadges = '';
+            if (vulnCounts.CRITICAL > 0) vulnBadges += getSeverityBadge('CRITICAL', vulnCounts.CRITICAL) + ' ';
+            if (vulnCounts.HIGH > 0) vulnBadges += getSeverityBadge('HIGH', vulnCounts.HIGH);
+
+            return `
+                <tr data-grade="${lib.grade.toLowerCase()}" data-months="${ageMonths}">
+                    <td>${lib.filename.replace(/\.[^/.]+$/, "")}</td>
+                    <td>${lib.version}</td>
+                    <td><span class="grade-letter" style="font-size: 1.5em; color: ${lib.grade === 'F' ? '#ff4444' : lib.grade === 'D' ? '#ff6600' : lib.grade === 'C' ? '#ffaa00' : lib.grade === 'B' ? '#88ff00' : '#00ff88'};">${lib.grade}</span></td>
+                    <td>${vulnBadges || '<span style="color: rgba(255,255,255,0.5);">None</span>'}</td>
+                    <td>${ageMonths} months</td>
+                    <td>
+                        <div class="risk-meter" style="height: 20px;">
+                            <div class="risk-fill" style="width: ${risk}%; font-size: 0.75em;">${risk}%</div>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        }
+
+        // Update the page with real data
+        async function updatePage() {
+            console.log('Fetching library data from Contrast API...');
+            const libraries = await fetchLibraries();
+
+            if (libraries.length === 0) {
+                console.warn('No libraries found or API call failed');
+                return;
+            }
+
+            console.log(`Loaded ${libraries.length} libraries`);
+            const stats = calculateStats(libraries);
+
+            // Update statistics
+            document.querySelector('.stats-grid .stat-card:nth-child(1) .stat-value').textContent = stats.total;
+            document.querySelector('.stats-grid .stat-card:nth-child(2) .stat-value').textContent = stats.withCVEs;
+            document.querySelector('.stats-grid .stat-card:nth-child(3) .stat-value').textContent = stats.totalCVEs;
+            document.querySelector('.stats-grid .stat-card:nth-child(4) .stat-value').textContent = stats.criticalVulns;
+
+            // Update grade distribution
+            const gradeCards = document.querySelectorAll('.grade-distribution .grade-card');
+            gradeCards[0].querySelector('.grade-count').textContent = stats.grades.A || 0;
+            gradeCards[1].querySelector('.grade-count').textContent = stats.grades.B || 0;
+            gradeCards[2].querySelector('.grade-count').textContent = stats.grades.C || 0;
+            gradeCards[3].querySelector('.grade-count').textContent = stats.grades.D || 0;
+            gradeCards[4].querySelector('.grade-count').textContent = stats.grades.F || 0;
+
+            // Update summary box with top issues
+            const criticalLibs = libraries
+                .filter(lib => lib.vulnerabilities && lib.vulnerabilities.some(v => v.severityCode === 'CRITICAL'))
+                .sort((a, b) => (b.vulnerabilities?.length || 0) - (a.vulnerabilities?.length || 0))
+                .slice(0, 5);
+
+            const summaryList = document.querySelector('.summary-box ul');
+            summaryList.innerHTML = criticalLibs.map(lib => {
+                const critCount = lib.vulnerabilities.filter(v => v.severityCode === 'CRITICAL').length;
+                return `<li><strong>${lib.filename}</strong> has ${critCount} CRITICAL CVE${critCount > 1 ? 's' : ''}</li>`;
+            }).join('');
+
+            // Create library cards for high-risk libraries (with vulnerabilities)
+            const highRiskLibs = libraries
+                .filter(lib => lib.totalVulnerabilities > 0 || lib.grade === 'F' || lib.grade === 'D')
+                .sort((a, b) => {
+                    const riskA = calculateRisk(a);
+                    const riskB = calculateRisk(b);
+                    return riskB - riskA;
+                })
+                .slice(0, 10); // Show top 10
+
+            const cardsContainer = document.querySelector('.filter-buttons').nextElementSibling;
+            const cardsHtml = highRiskLibs.map(lib => createLibraryCard(lib)).join('');
+
+            // Remove existing library cards but keep filter buttons
+            const existingCards = document.querySelectorAll('.library-card');
+            existingCards.forEach(card => card.remove());
+
+            // Insert new cards
+            document.querySelector('.filter-buttons').insertAdjacentHTML('afterend', cardsHtml);
+
+            // Update table with remaining libraries
+            const tableLibs = libraries
+                .filter(lib => !highRiskLibs.includes(lib))
+                .sort((a, b) => calculateRisk(b) - calculateRisk(a))
+                .slice(0, 20);
+
+            const tableBody = document.querySelector('.library-table tbody');
+            tableBody.innerHTML = tableLibs.map(lib => createTableRow(lib)).join('');
+
+            // Update metrics
+            const avgAgeElem = document.querySelector('.container > div:last-of-type .container > div:nth-child(1) > div:nth-child(2)');
+            if (avgAgeElem) avgAgeElem.textContent = stats.avgAge + ' months';
+
+            const pctWithCVEs = stats.total > 0 ? Math.round((stats.withCVEs / stats.total) * 100) : 0;
+            const pctElem = document.querySelector('.container > div:last-of-type .container > div:nth-child(2) > div:nth-child(2)');
+            if (pctElem) pctElem.textContent = pctWithCVEs + '%';
+
+            // Calculate average grade
+            let totalGradePoints = 0;
+            const gradePoints = { A: 4, B: 3, C: 2, D: 1, F: 0 };
+            libraries.forEach(lib => {
+                totalGradePoints += gradePoints[lib.grade] || 0;
+            });
+            const avgGrade = totalGradePoints / stats.total;
+            let avgGradeLetter = 'C-';
+            if (avgGrade >= 3.5) avgGradeLetter = 'A';
+            else if (avgGrade >= 2.5) avgGradeLetter = 'B';
+            else if (avgGrade >= 1.5) avgGradeLetter = 'C';
+            else if (avgGrade >= 0.5) avgGradeLetter = 'D';
+            else avgGradeLetter = 'F';
+
+            const avgGradeElem = document.querySelector('.container > div:last-of-type .container > div:nth-child(3) > div:nth-child(2)');
+            if (avgGradeElem) avgGradeElem.textContent = avgGradeLetter;
+
+            console.log('Page updated successfully with real data');
+
+            // Animate risk meters
+            setTimeout(() => {
+                const riskFills = document.querySelectorAll('.risk-fill');
+                riskFills.forEach(fill => {
+                    const width = fill.style.width;
+                    fill.style.width = '0%';
+                    setTimeout(() => {
+                        fill.style.width = width;
+                    }, 50);
+                });
+            }, 100);
+        }
+
         // Filter functionality
         function filterLibraries(filter) {
             const cards = document.querySelectorAll('.library-card');
@@ -1096,17 +1447,8 @@
         `;
         document.head.appendChild(style);
 
-        // Animate risk meters on load
-        window.addEventListener('load', () => {
-            const riskFills = document.querySelectorAll('.risk-fill');
-            riskFills.forEach(fill => {
-                const width = fill.style.width;
-                fill.style.width = '0%';
-                setTimeout(() => {
-                    fill.style.width = width;
-                }, 100);
-            });
-        });
+        // Load data when page loads
+        window.addEventListener('load', updatePage);
     </script>
 </body>
 </html>

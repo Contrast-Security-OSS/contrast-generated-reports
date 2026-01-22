@@ -29,12 +29,161 @@
             opacity: 0.9;
         }
         #map {
-            height: 80vh;
+            height: 60vh;
             width: 100%;
+        }
+        #metrics {
+            background: #0a0e27;
+            padding: 30px;
+        }
+        .metrics-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .metric-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 25px;
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            transition: all 0.3s ease;
+        }
+        .metric-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.4);
+            border-color: #667eea;
+        }
+        .metric-card.blocked {
+            border-color: rgba(0, 255, 136, 0.5);
+        }
+        .metric-card.exploited {
+            border-color: rgba(255, 68, 68, 0.5);
+        }
+        .metric-card.probed {
+            border-color: rgba(255, 170, 0, 0.5);
+        }
+        .metric-card.monitored {
+            border-color: rgba(68, 136, 255, 0.5);
+        }
+        .metric-label {
+            font-size: 0.9em;
+            opacity: 0.8;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .metric-value {
+            font-size: 3em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .metric-card.blocked .metric-value {
+            color: #00ff88;
+        }
+        .metric-card.exploited .metric-value {
+            color: #ff4444;
+        }
+        .metric-card.probed .metric-value {
+            color: #ffaa00;
+        }
+        .metric-card.monitored .metric-value {
+            color: #4488ff;
+        }
+        .metric-subtitle {
+            font-size: 0.85em;
+            opacity: 0.7;
+        }
+        .correlation-section {
+            margin-top: 30px;
+        }
+        .correlation-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 25px;
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            margin-bottom: 20px;
+        }
+        .correlation-title {
+            color: #667eea;
+            font-size: 1.4em;
+            margin-bottom: 15px;
+            border-bottom: 2px solid rgba(102, 126, 234, 0.3);
+            padding-bottom: 10px;
+        }
+        .correlation-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .correlation-item {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+        .correlation-item strong {
+            color: #667eea;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .threat-level {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        .threat-level.critical {
+            background: rgba(255, 0, 0, 0.2);
+            color: #ff4444;
+            border: 1px solid #ff4444;
+        }
+        .threat-level.high {
+            background: rgba(255, 68, 68, 0.2);
+            color: #ff8888;
+            border: 1px solid #ff8888;
+        }
+        .threat-level.medium {
+            background: rgba(255, 170, 0, 0.2);
+            color: #ffaa00;
+            border: 1px solid #ffaa00;
+        }
+        .threat-level.low {
+            background: rgba(68, 136, 255, 0.2);
+            color: #4488ff;
+            border: 1px solid #4488ff;
+        }
+        .progress-bar {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            height: 20px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        .progress-fill {
+            height: 100%;
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75em;
+            font-weight: bold;
+        }
+        .progress-fill.success {
+            background: linear-gradient(90deg, #00ff88 0%, #00cc66 100%);
+        }
+        .progress-fill.danger {
+            background: linear-gradient(90deg, #ff4444 0%, #dd3333 100%);
         }
         #legend {
             position: absolute;
-            bottom: 30px;
+            top: 30px;
             right: 30px;
             background: rgba(10, 14, 39, 0.95);
             padding: 20px;
@@ -68,10 +217,15 @@
             border: 2px solid #667eea;
             border-radius: 8px;
             padding: 10px;
-            font-size: 14px;
+            font-size: 12px;
+            max-width: 200px;
+            white-space: nowrap;
         }
         .attack-tooltip strong {
             color: #667eea;
+        }
+        .leaflet-tooltip {
+            transition: opacity 0.3s ease-out 1.5s !important;
         }
         .leaflet-popup-content-wrapper {
             background: rgba(10, 14, 39, 0.95);
@@ -116,12 +270,152 @@
         </div>
     </div>
 
+    <!-- Attack Metrics Section -->
+    <div id="metrics">
+        <div class="metrics-container">
+            <h2 style="color: #667eea; font-size: 2em; margin-bottom: 30px; text-align: center;">Attack Analytics Dashboard</h2>
+
+            <!-- Key Metrics Grid -->
+            <div class="metrics-grid">
+                <div class="metric-card blocked">
+                    <div class="metric-label">Blocked Attacks</div>
+                    <div class="metric-value" id="blocked-count">0</div>
+                    <div class="metric-subtitle">Successfully stopped</div>
+                </div>
+                <div class="metric-card exploited">
+                    <div class="metric-label">Exploited</div>
+                    <div class="metric-value" id="exploited-count">0</div>
+                    <div class="metric-subtitle">Successful breaches</div>
+                </div>
+                <div class="metric-card probed">
+                    <div class="metric-label">Probed</div>
+                    <div class="metric-value" id="probed-count">0</div>
+                    <div class="metric-subtitle">Reconnaissance attempts</div>
+                </div>
+                <div class="metric-card monitored">
+                    <div class="metric-label">Monitored</div>
+                    <div class="metric-value" id="monitored-count">0</div>
+                    <div class="metric-subtitle">Under observation</div>
+                </div>
+            </div>
+
+            <!-- Security Correlations -->
+            <div class="correlation-section">
+                <div class="correlation-card">
+                    <h3 class="correlation-title">🎯 Attack Effectiveness Analysis</h3>
+                    <div id="effectiveness-analysis"></div>
+                </div>
+
+                <div class="correlation-card">
+                    <h3 class="correlation-title">🔍 Top Attack Patterns</h3>
+                    <div class="correlation-grid" id="attack-patterns"></div>
+                </div>
+
+                <div class="correlation-card">
+                    <h3 class="correlation-title">🛡️ Defense Posture</h3>
+                    <div id="defense-posture"></div>
+                </div>
+
+                <div class="correlation-card">
+                    <h3 class="correlation-title">⚠️ High-Risk Indicators</h3>
+                    <div class="correlation-grid" id="risk-indicators"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
+        // Configuration
+        const CONFIG = {
+            orgId: '545a3bce-97c5-4732-af38-1ac459087b0a'
+        };
+
         // Server location: Northeast Indiana (Fort Wayne area)
         const serverLocation = [41.0793, -85.1394];
 
-        // Attack data with mock geographic locations for private IPs
-        const attacks = [
+        // Fetch attacks from Contrast API
+        async function fetchAttacks() {
+            try {
+                const response = await fetch(`/api/contrast/api/ng/${CONFIG.orgId}/attacks?limit=50`, {
+                    headers: { 'Accept': 'application/json' }
+                });
+
+                if (!response.ok) {
+                    console.error('Failed to fetch attacks');
+                    return [];
+                }
+
+                const result = await response.json();
+                return result.attacks || [];
+            } catch (error) {
+                console.error('Error fetching attacks:', error);
+                return [];
+            }
+        }
+
+        // Map IP to geographic location (mock for private IPs)
+        function getLocationForIP(ip) {
+            const locations = [
+                { coords: [34.0522, -118.2437], city: 'Los Angeles, CA' },
+                { coords: [47.6062, -122.3321], city: 'Seattle, WA' },
+                { coords: [39.7392, -104.9903], city: 'Denver, CO' },
+                { coords: [29.7604, -95.3698], city: 'Houston, TX' },
+                { coords: [25.7617, -80.1918], city: 'Miami, FL' },
+                { coords: [42.3601, -71.0589], city: 'Boston, MA' },
+                { coords: [40.7128, -74.0060], city: 'New York, NY' },
+                { coords: [33.7490, -84.3880], city: 'Atlanta, GA' },
+                { coords: [41.8781, -87.6298], city: 'Chicago, IL' },
+                { coords: [37.7749, -122.4194], city: 'San Francisco, CA' }
+            ];
+            // Use IP as seed for consistent location mapping
+            const hash = ip.split('.').reduce((acc, num) => acc + parseInt(num), 0);
+            return locations[hash % locations.length];
+        }
+
+        // Transform API attacks to map format
+        function transformAttacks(apiAttacks) {
+            const attackMap = {};
+
+            apiAttacks.forEach(attack => {
+                const ip = attack.source || 'Unknown';
+                if (!attackMap[ip]) {
+                    const location = getLocationForIP(ip);
+                    attackMap[ip] = {
+                        ip: ip,
+                        location: location.coords,
+                        city: location.city,
+                        count: 0,
+                        status: attack.status || 'PROBED',
+                        rules: new Set(),
+                        probes: 0,
+                        targets: new Set()
+                    };
+                }
+
+                attackMap[ip].count++;
+                attackMap[ip].probes += attack.probes || 1;
+
+                if (attack.rules) {
+                    attack.rules.forEach(rule => attackMap[ip].rules.add(rule.name || rule));
+                }
+
+                if (attack.applications) {
+                    attack.applications.forEach(app => {
+                        const appName = app.name || app;
+                        attackMap[ip].targets.add(appName.replace('cargo-cats-contrast-', '').replace('cargo-cats-', ''));
+                    });
+                }
+            });
+
+            return Object.values(attackMap).map(attack => ({
+                ...attack,
+                rules: Array.from(attack.rules),
+                targets: Array.from(attack.targets)
+            }));
+        }
+
+        // Static fallback data
+        const staticAttacks = [
             {
                 ip: '10.1.3.116',
                 location: [34.0522, -118.2437], // Los Angeles area
@@ -184,37 +478,47 @@
             }
         ];
 
-        // Initialize map centered on US
-        const map = L.map('map').setView([39.8283, -98.5795], 5);
+        // Initialize map
+        async function initializeMap() {
+            // Initialize map centered on US
+            const map = L.map('map').setView([39.8283, -98.5795], 5);
 
-        // Add tile layer
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-            attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
-            subdomains: 'abcd',
-            maxZoom: 19
-        }).addTo(map);
+            // Add tile layer
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+                attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
+                subdomains: 'abcd',
+                maxZoom: 19
+            }).addTo(map);
 
-        // Add server marker
-        const serverIcon = L.divIcon({
-            className: 'custom-div-icon',
-            html: `<div style="background-color: #00ff88; width: 20px; height: 20px; border-radius: 50%; border: 3px solid #fff; box-shadow: 0 0 20px #00ff88;"></div>`,
-            iconSize: [20, 20],
-            iconAnchor: [10, 10]
-        });
+            // Fetch real attack data
+            const apiAttacks = await fetchAttacks();
+            const attacks = apiAttacks.length > 0 ? transformAttacks(apiAttacks) : staticAttacks;
 
-        L.marker(serverLocation, { icon: serverIcon })
-            .addTo(map)
-            .bindPopup(`
-                <div class="attack-tooltip">
-                    <strong>🖥️ Server Location</strong><br>
-                    Fort Wayne, IN<br>
-                    Northeast Indiana<br>
-                    <strong>Target:</strong> Cargo Cats Infrastructure
-                </div>
-            `);
+            if (apiAttacks.length === 0) {
+                console.log('Using static attack data - API fetch failed or returned no data');
+            }
 
-        // Add attack source markers and lines
-        attacks.forEach(attack => {
+            // Add server marker
+            const serverIcon = L.divIcon({
+                className: 'custom-div-icon',
+                html: `<div style="background-color: #00ff88; width: 20px; height: 20px; border-radius: 50%; border: 3px solid #fff; box-shadow: 0 0 20px #00ff88;"></div>`,
+                iconSize: [20, 20],
+                iconAnchor: [10, 10]
+            });
+
+            L.marker(serverLocation, { icon: serverIcon })
+                .addTo(map)
+                .bindPopup(`
+                    <div class="attack-tooltip">
+                        <strong>🖥️ Server Location</strong><br>
+                        Fort Wayne, IN<br>
+                        Northeast Indiana<br>
+                        <strong>Target:</strong> Cargo Cats Infrastructure
+                    </div>
+                `);
+
+            // Add attack source markers and lines
+            attacks.forEach(attack => {
             // Determine color based on status
             const color = attack.status === 'EXPLOITED' ? '#ff4444' : '#ffaa00';
             const statusClass = attack.status === 'EXPLOITED' ? 'status-exploited' : 'status-probed';
@@ -246,23 +550,30 @@
             // Draw animated line from attack source to server
             const line = L.polyline([attack.location, serverLocation], {
                 color: color,
-                weight: 3,
+                weight: 6,
                 opacity: 0.7,
                 dashArray: '10, 10',
                 className: 'attack-line'
             }).addTo(map);
 
-            // Add tooltip to line
-            line.bindTooltip(`
+            // Add invisible wider line for easier hovering
+            const hoverLine = L.polyline([attack.location, serverLocation], {
+                color: 'transparent',
+                weight: 20,
+                opacity: 0
+            }).addTo(map);
+
+            // Create tooltip content
+            const tooltipContent = `
                 <div class="attack-tooltip">
                     <strong>${attack.ip} → Server</strong><br>
-                    <strong>Status:</strong> <span class="${statusClass}">${attack.status}</span><br>
-                    <strong>Rules:</strong> ${attack.rules.join(', ')}<br>
-                    <strong>Probes:</strong> ${attack.probes}
+                    <span class="${statusClass}">${attack.status}</span> | ${attack.probes} probes
                 </div>
-            `, {
-                sticky: true
-            });
+            `;
+
+            // Add tooltip to both lines for easier hovering
+            line.bindTooltip(tooltipContent, { sticky: true, direction: 'top' });
+            hoverLine.bindTooltip(tooltipContent, { sticky: true, direction: 'top' });
 
             // Add pulsing animation
             let opacity = 0.7;
@@ -277,21 +588,243 @@
                 }
                 line.setStyle({ opacity: opacity });
             }, 100);
-        });
+            });
 
-        // Add some styling for the attack lines animation
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes dash {
-                to {
-                    stroke-dashoffset: -100;
+            // Add some styling for the attack lines animation
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes dash {
+                    to {
+                        stroke-dashoffset: -100;
+                    }
                 }
+                .attack-line {
+                    animation: dash 2s linear infinite;
+                }
+            `;
+            document.head.appendChild(style);
+
+            // Calculate and display attack metrics
+            calculateMetrics(attacks, apiAttacks);
+        }
+
+        // Calculate and display attack metrics
+        function calculateMetrics(attacks, apiAttacks) {
+            // Count by status
+            const statusCounts = {
+                BLOCKED: 0,
+                EXPLOITED: 0,
+                PROBED: 0,
+                MONITORED: 0
+            };
+
+            const ruleFrequency = {};
+            const targetFrequency = {};
+            let totalProbes = 0;
+
+            // Process attack data
+            if (apiAttacks && apiAttacks.length > 0) {
+                apiAttacks.forEach(attack => {
+                    const status = attack.status || 'PROBED';
+                    statusCounts[status] = (statusCounts[status] || 0) + 1;
+                    totalProbes += attack.probes || 1;
+
+                    // Count rules
+                    if (attack.rules) {
+                        attack.rules.forEach(rule => {
+                            const ruleName = rule.name || rule;
+                            ruleFrequency[ruleName] = (ruleFrequency[ruleName] || 0) + 1;
+                        });
+                    }
+
+                    // Count targets
+                    if (attack.applications) {
+                        attack.applications.forEach(app => {
+                            const appName = (app.name || app).replace('cargo-cats-contrast-', '').replace('cargo-cats-', '');
+                            targetFrequency[appName] = (targetFrequency[appName] || 0) + 1;
+                        });
+                    }
+                });
+            } else {
+                // Use static data
+                attacks.forEach(attack => {
+                    statusCounts[attack.status]++;
+                    totalProbes += attack.probes;
+                    attack.rules.forEach(rule => {
+                        ruleFrequency[rule] = (ruleFrequency[rule] || 0) + 1;
+                    });
+                    attack.targets.forEach(target => {
+                        targetFrequency[target] = (targetFrequency[target] || 0) + 1;
+                    });
+                });
             }
-            .attack-line {
-                animation: dash 2s linear infinite;
+
+            // Update metric cards
+            document.getElementById('blocked-count').textContent = statusCounts.BLOCKED || 0;
+            document.getElementById('exploited-count').textContent = statusCounts.EXPLOITED || 0;
+            document.getElementById('probed-count').textContent = statusCounts.PROBED || 0;
+            document.getElementById('monitored-count').textContent = statusCounts.MONITORED || 0;
+
+            // Calculate effectiveness metrics
+            const totalAttacks = Object.values(statusCounts).reduce((a, b) => a + b, 0);
+            const blockedRate = totalAttacks > 0 ? ((statusCounts.BLOCKED / totalAttacks) * 100).toFixed(1) : 0;
+            const exploitedRate = totalAttacks > 0 ? ((statusCounts.EXPLOITED / totalAttacks) * 100).toFixed(1) : 0;
+
+            // Populate effectiveness analysis
+            document.getElementById('effectiveness-analysis').innerHTML = `
+                <div class="correlation-grid">
+                    <div class="correlation-item">
+                        <strong>Defense Success Rate</strong>
+                        <div class="progress-bar">
+                            <div class="progress-fill success" style="width: ${blockedRate}%">${blockedRate}%</div>
+                        </div>
+                        <div style="margin-top: 5px; font-size: 0.85em;">
+                            ${statusCounts.BLOCKED} attacks successfully blocked out of ${totalAttacks} total
+                        </div>
+                    </div>
+                    <div class="correlation-item">
+                        <strong>Breach Rate</strong>
+                        <div class="progress-bar">
+                            <div class="progress-fill danger" style="width: ${exploitedRate}%">${exploitedRate}%</div>
+                        </div>
+                        <div style="margin-top: 5px; font-size: 0.85em;">
+                            ${statusCounts.EXPLOITED} successful exploits detected
+                        </div>
+                    </div>
+                    <div class="correlation-item">
+                        <strong>Attack Intensity</strong>
+                        <div style="font-size: 2em; color: #667eea; font-weight: bold; margin: 10px 0;">
+                            ${totalProbes}
+                        </div>
+                        <div style="font-size: 0.85em;">
+                            Total probe attempts across all attacks
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Populate attack patterns (top 5 rules)
+            const topRules = Object.entries(ruleFrequency)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 5);
+
+            document.getElementById('attack-patterns').innerHTML = topRules.map(([rule, count]) => {
+                const threatLevel = count >= 3 ? 'critical' : count >= 2 ? 'high' : 'medium';
+                return `
+                    <div class="correlation-item">
+                        <strong>${rule}</strong>
+                        <span class="threat-level ${threatLevel}">${threatLevel.toUpperCase()}</span>
+                        <div style="margin-top: 10px; font-size: 1.5em; color: #667eea;">
+                            ${count} incidents
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // Populate defense posture
+            const mostTargeted = Object.entries(targetFrequency)
+                .sort((a, b) => b[1] - a[1])[0];
+
+            document.getElementById('defense-posture').innerHTML = `
+                <div class="correlation-grid">
+                    <div class="correlation-item">
+                        <strong>Most Targeted Service</strong>
+                        <div style="font-size: 1.3em; color: #ffaa00; margin: 10px 0;">
+                            ${mostTargeted ? mostTargeted[0] : 'N/A'}
+                        </div>
+                        <div style="font-size: 0.85em;">
+                            ${mostTargeted ? mostTargeted[1] : 0} attacks targeting this service
+                        </div>
+                    </div>
+                    <div class="correlation-item">
+                        <strong>Unique Attack Sources</strong>
+                        <div style="font-size: 1.3em; color: #667eea; margin: 10px 0;">
+                            ${attacks.length} IPs
+                        </div>
+                        <div style="font-size: 0.85em;">
+                            Distinct source addresses detected
+                        </div>
+                    </div>
+                    <div class="correlation-item">
+                        <strong>Attack Diversity</strong>
+                        <div style="font-size: 1.3em; color: #667eea; margin: 10px 0;">
+                            ${Object.keys(ruleFrequency).length} vectors
+                        </div>
+                        <div style="font-size: 0.85em;">
+                            Different attack types identified
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Populate risk indicators
+            const riskIndicators = [];
+
+            if (statusCounts.EXPLOITED > 0) {
+                riskIndicators.push({
+                    title: 'Active Breaches Detected',
+                    level: 'critical',
+                    description: `${statusCounts.EXPLOITED} successful exploitation(s) require immediate incident response`
+                });
             }
-        `;
-        document.head.appendChild(style);
+
+            if (exploitedRate > 10) {
+                riskIndicators.push({
+                    title: 'High Breach Rate',
+                    level: 'critical',
+                    description: `${exploitedRate}% of attacks succeeded - defense rules may need tuning`
+                });
+            }
+
+            if (totalProbes > 100) {
+                riskIndicators.push({
+                    title: 'Intense Reconnaissance',
+                    level: 'high',
+                    description: `${totalProbes} total probes indicates active reconnaissance or automated scanning`
+                });
+            }
+
+            if (Object.keys(targetFrequency).length <= 2 && attacks.length > 3) {
+                riskIndicators.push({
+                    title: 'Targeted Campaign',
+                    level: 'high',
+                    description: 'Multiple attacks focusing on specific services suggests coordinated effort'
+                });
+            }
+
+            if (attacks.length >= 5) {
+                riskIndicators.push({
+                    title: 'Multiple Attack Sources',
+                    level: 'medium',
+                    description: `${attacks.length} distinct IPs may indicate distributed attack or botnet activity`
+                });
+            }
+
+            if (riskIndicators.length === 0) {
+                riskIndicators.push({
+                    title: 'Security Posture: Good',
+                    level: 'low',
+                    description: 'No critical risk indicators detected. Continue monitoring.'
+                });
+            }
+
+            document.getElementById('risk-indicators').innerHTML = riskIndicators.map(indicator => `
+                <div class="correlation-item" style="border-left-color: ${
+                    indicator.level === 'critical' ? '#ff4444' :
+                    indicator.level === 'high' ? '#ff8888' :
+                    indicator.level === 'medium' ? '#ffaa00' : '#4488ff'
+                };">
+                    <strong>${indicator.title}</strong>
+                    <span class="threat-level ${indicator.level}">${indicator.level.toUpperCase()}</span>
+                    <div style="margin-top: 8px; font-size: 0.9em; opacity: 0.9;">
+                        ${indicator.description}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', initializeMap);
     </script>
 </body>
 </html>

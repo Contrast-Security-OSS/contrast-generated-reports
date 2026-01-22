@@ -1400,6 +1400,63 @@ public class SecurityConfig {
     </div>
 
     <script>
+        // Configuration
+        const CONFIG = {
+            orgId: '545a3bce-97c5-4732-af38-1ac459087b0a'
+        };
+
+        // Fetch vulnerabilities for training stats
+        async function fetchVulnerabilities() {
+            try {
+                const response = await fetch(`/api/contrast/api/ng/${CONFIG.orgId}/orgtraces/filter?expand=skip_links&limit=100`, {
+                    headers: { 'Accept': 'application/json' }
+                });
+
+                if (!response.ok) {
+                    console.error('Failed to fetch vulnerabilities');
+                    return [];
+                }
+
+                const result = await response.json();
+                return result.traces || [];
+            } catch (error) {
+                console.error('Error fetching vulnerabilities:', error);
+                return [];
+            }
+        }
+
+        // Update security posture stats with real data
+        async function updateSecurityStats() {
+            const vulns = await fetchVulnerabilities();
+
+            if (vulns.length > 0) {
+                const critical = vulns.filter(v => v.severity === 'Critical').length;
+                const high = vulns.filter(v => v.severity === 'High').length;
+                const medium = vulns.filter(v => v.severity === 'Medium').length;
+
+                // Update security posture card
+                const statValues = document.querySelectorAll('.card')[1].querySelectorAll('.stat-value');
+                if (statValues[0]) statValues[0].textContent = critical;
+                if (statValues[1]) statValues[1].textContent = high;
+                if (statValues[2]) statValues[2].textContent = medium;
+
+                // Update top vulnerabilities if available
+                const topVulns = vulns.slice(0, 3);
+                const topVulnsList = document.querySelector('.card:nth-child(3) ol');
+                if (topVulnsList && topVulns.length > 0) {
+                    topVulnsList.innerHTML = topVulns.map(v => {
+                        const severityClass = v.severity.toLowerCase();
+                        const vulnType = v.rule_name || v.type || 'Unknown';
+                        const appName = (v.application?.name || 'Unknown').replace('cargo-cats-contrast-', '').replace('cargo-cats-', '');
+                        return `<li><span class="${severityClass}">${vulnType}</span> - ${appName}</li>`;
+                    }).join('');
+                }
+            }
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', updateSecurityStats);
+
         // State management
         let lessonsCompleted = 0;
         let questionsCorrect = 0;

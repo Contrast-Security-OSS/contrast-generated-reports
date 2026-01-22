@@ -1650,6 +1650,69 @@
     </div>
 
     <script>
+        // Configuration
+        const CONFIG = {
+            orgId: '545a3bce-97c5-4732-af38-1ac459087b0a',
+            appId: 'f1df5e87-5088-42a3-be76-5bdd4457cbb3' // Example app
+        };
+
+        // Fetch vulnerabilities for a specific session (branch/PR)
+        // TBD: GitHub PR integration - actual PR data from GitHub API
+        // TBD: Session metadata mapping - map GitHub branch to Contrast session
+        async function fetchPRVulnerabilities(branch = 'main') {
+            try {
+                // Using session metadata filter to get vulnerabilities from specific branch
+                const response = await fetch(`/api/contrast/api/ng/${CONFIG.orgId}/orgtraces/filter?expand=skip_links&limit=50`, {
+                    headers: { 'Accept': 'application/json' }
+                });
+
+                if (!response.ok) {
+                    console.error('Failed to fetch PR vulnerabilities');
+                    return [];
+                }
+
+                const result = await response.json();
+                return result.traces || [];
+            } catch (error) {
+                console.error('Error fetching PR vulnerabilities:', error);
+                return [];
+            }
+        }
+
+        // Update PR stats with real vulnerability data
+        async function updatePRStats() {
+            const vulns = await fetchPRVulnerabilities();
+
+            if (vulns.length > 0) {
+                const critical = vulns.filter(v => v.severity === 'Critical').length;
+                const high = vulns.filter(v => v.severity === 'High').length;
+                const medium = vulns.filter(v => v.severity === 'Medium').length;
+
+                // Update stat cards
+                const statCards = document.querySelectorAll('.stat-card');
+                if (statCards[0]) statCards[0].querySelector('.stat-value').textContent = critical;
+                if (statCards[1]) statCards[1].querySelector('.stat-value').textContent = high;
+                if (statCards[2]) statCards[2].querySelector('.stat-value').textContent = medium;
+
+                // Update PR status badge
+                const statusBadge = document.querySelector('.badge.blocked');
+                if (statusBadge && (critical > 0 || high > 0)) {
+                    statusBadge.innerHTML = `🚫 Security Gate: BLOCKED (${critical + high} critical/high)`;
+                    statusBadge.className = 'badge blocked';
+                } else if (statusBadge) {
+                    statusBadge.innerHTML = '✓ Security Gate: PASSED';
+                    statusBadge.className = 'badge approved';
+                }
+            }
+        }
+
+        // Note: Full PR integration requires additional components (TBD):
+        // - GitHub API integration for PR metadata (branch, author, files changed, etc.)
+        // - Session metadata mapping between GitHub branches and Contrast sessions
+        // - Diff-based vulnerability filtering (only show vulnerabilities in changed files)
+        // - GitHub webhook integration for automatic PR scanning
+        // - GitHub status check API integration to block/approve PRs
+
         function switchTab(tabName) {
             // Hide all tab contents
             document.querySelectorAll('.tab-content').forEach(content => {
@@ -1667,6 +1730,9 @@
             // Add active class to clicked tab
             event.target.classList.add('active');
         }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', updatePRStats);
     </script>
 </body>
 </html>
