@@ -6,3 +6,10 @@
 
 # Credentials (never commit)
 .creds
+
+# Node modules
+node_modules/
+
+# Test coverage
+coverage/
+.coverage/
