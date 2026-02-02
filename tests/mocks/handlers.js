@@ -198,5 +198,21 @@ export const handlers = [
   // Network error simulation
   http.get(`${CONTRAST_API_BASE}/${ORG_ID}/test-network-error`, () => {
     return HttpResponse.error();
+  }),
+
+  // 401 Unauthorized
+  http.get(`${CONTRAST_API_BASE}/${ORG_ID}/unauthorized`, () => {
+    return HttpResponse.json(
+      { success: false, messages: ['Unauthorized'] },
+      { status: 401 }
+    );
+  }),
+
+  // 404 Not Found
+  http.get(`${CONTRAST_API_BASE}/${ORG_ID}/nonexistent`, () => {
+    return HttpResponse.json(
+      { success: false, messages: ['Resource not found'] },
+      { status: 404 }
+    );
   })
 ];
