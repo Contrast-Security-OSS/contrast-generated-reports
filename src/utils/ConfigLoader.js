@@ -127,7 +127,7 @@ export class ConfigLoader {
       apiKey: '16s58pRXBJrIYcn9hQO9v7g3kU4Jf02o',
       serviceKey: '0JWTRJY3994AMHTY',
       username: 'jason.easterday@contrastsecurity.com',
-      baseUrl: 'https://eval.contrastsecurity.com/Contrast/api/ng'
+      baseUrl: 'http://localhost:8081/Contrast/api/ng'  // CORS proxy for local development
     };
 
     return window.CONTRAST_CONFIG;
