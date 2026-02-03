@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartFix Code Remediation Guide - MVC</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/java.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%);
+            color: #e0e6ed;
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 60px;
+            padding-bottom: 40px;
+            border-bottom: 2px solid rgba(102, 126, 234, 0.2);
+        }
+
+        h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 20px;
+        }
+
+        .subtitle {
+            font-size: 1.25rem;
+            color: #a0aec0;
+        }
+
+        #loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+            font-size: 1.5em;
+        }
+
+        #error-message {
+            display: none;
+            background: rgba(255,68,68,0.2);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border: 2px solid rgba(255,68,68,0.5);
+        }
+
+        #fixes-container {
+            display: flex;
+            flex-direction: column;
+            gap: 50px;
+        }
+
+        .vulnerability-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            border-radius: 16px;
+            padding: 40px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .vulnerability-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 60px rgba(102, 126, 234, 0.15);
+        }
+
+        .vuln-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .vuln-title h2 {
+            font-size: 2rem;
+            color: #fff;
+            margin-bottom: 10px;
+        }
+
+        .vuln-id {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            color: #a0aec0;
+            background: rgba(102, 126, 234, 0.1);
+            padding: 5px 12px;
+            border-radius: 6px;
+            display: inline-block;
+        }
+
+        .severity-critical {
+            background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
+            color: #fff;
+            padding: 8px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .severity-high {
+            background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
+            color: #fff;
+            padding: 8px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .vuln-meta {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .meta-item {
+            background: rgba(102, 126, 234, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .meta-label {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+
+        .meta-value {
+            color: #fff;
+            font-weight: 500;
+        }
+
+        .effort-low {
+            color: #4ade80;
+        }
+
+        .effort-medium {
+            color: #fbbf24;
+        }
+
+        .effort-high {
+            color: #f87171;
+        }
+
+        .security-violation {
+            background: rgba(229, 62, 62, 0.1);
+            border-left: 4px solid #e53e3e;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+
+        .security-violation h3 {
+            color: #fc8181;
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+        }
+
+        .code-comparison {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .code-section h3 {
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+        }
+
+        .vulnerable-section h3 {
+            color: #fc8181;
+        }
+
+        .fixed-section h3 {
+            color: #68d391;
+        }
+
+        .code-block {
+            background: #1a1d26;
+            border-radius: 12px;
+            padding: 20px;
+            overflow-x: auto;
+            border: 1px solid rgba(102, 126, 234, 0.2);
+        }
+
+        .vulnerable-code {
+            border-left: 4px solid #e53e3e;
+        }
+
+        .fixed-code {
+            border-left: 4px solid #48bb78;
+        }
+
+        .code-block pre {
+            margin: 0;
+            color: #abb2bf;
+            font-family: 'JetBrains Mono', 'Courier New', monospace;
+            font-size: 0.9em;
+            line-height: 1.6;
+        }
+
+        .no-vulnerabilities {
+            text-align: center;
+            padding: 60px;
+            color: #4ade80;
+            font-size: 1.5em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔧 SmartFix Code Remediation Guide</h1>
+            <p class="subtitle">AI-powered security fixes for your vulnerabilities</p>
+        </header>
+
+        <div id="loading" style="display:none;">
+            <p>Loading vulnerabilities and generating fix recommendations...</p>
+        </div>
+
+        <div id="error-message" style="display:none;"></div>
+
+        <div id="fixes-container"></div>
+    </div>
+
+    <!-- MVC JavaScript -->
+    <script type="module">
+        // Import MVC classes and ConfigLoader
+        import { ConfigLoader } from './src/utils/ConfigLoader.js';
+        import { PocGeneratorModel } from './src/models/PocGeneratorModel.js';
+        import { SmartFixController } from './src/controllers/SmartFixController.js';
+        import { SmartFixView } from './src/views/SmartFixView.js';
+        import { PocGeneratorController } from './src/controllers/PocGeneratorController.js';
+
+        // Load credentials from .creds file
+        await ConfigLoader.init();
+
+        // Initialize MVC
+        const model = new PocGeneratorModel(); // Reuse model for fetching vulnerabilities
+        const controller = new SmartFixController();
+        const pocController = new PocGeneratorController(); // For enrichment
+        const view = new SmartFixView();
+
+        // Main application logic
+        async function loadDashboard() {
+            try {
+                view.showLoading();
+                view.hideError();
+
+                // Fetch vulnerabilities with details (Model)
+                const vulns = await model.fetchVulnerabilitiesWithDetails({
+                    severities: ['CRITICAL', 'HIGH'],
+                    limit: 10
+                });
+
+                if (vulns.length === 0) {
+                    view.hideLoading();
+                    view.showError('No critical or high vulnerabilities found');
+                    return;
+                }
+
+                // Transform data (Controller)
+                const enrichedVulns = vulns.map(vuln => {
+                    // Enrich with basic fields
+                    const enriched = pocController.enrichVulnerability(vuln);
+
+                    // Extract fix recommendation
+                    const fixRecommendation = controller.extractFixRecommendation(vuln);
+
+                    // Generate fixed code
+                    const fixedCode = controller.generateFixedCode(vuln);
+
+                    // Estimate fix effort
+                    const effort = controller.estimateFixEffort(vuln);
+
+                    return {
+                        ...enriched,
+                        fixRecommendation,
+                        fixedCode,
+                        effort
+                    };
+                });
+
+                // Prioritize by impact (Controller)
+                const prioritized = controller.prioritizeByImpact(enrichedVulns);
+
+                // Render (View)
+                view.renderFixes(prioritized);
+
+                view.hideLoading();
+
+                // Highlight code blocks
+                document.querySelectorAll('pre code').forEach((block) => {
+                    hljs.highlightElement(block);
+                });
+
+                console.log(`Loaded ${prioritized.length} vulnerabilities with fix recommendations`);
+            } catch (error) {
+                view.hideLoading();
+                view.showError(`Failed to load dashboard: ${error.message}`);
+                console.error('Dashboard error:', error);
+            }
+        }
+
+        // Start the application
+        loadDashboard();
+    </script>
+</body>
+</html>
