@@ -76,19 +76,14 @@
 
     <!-- MVC JavaScript -->
     <script type="module">
-        // Import MVC classes
+        // Import MVC classes and ConfigLoader
+        import { ConfigLoader } from './src/utils/ConfigLoader.js';
         import { LibrarySecurityModel } from './src/models/LibrarySecurityModel.js';
         import { LibrarySecurityController } from './src/controllers/LibrarySecurityController.js';
         import { LibrarySecurityView } from './src/views/LibrarySecurityView.js';
 
-        // Load credentials from window (injected by server or inline script)
-        window.CONTRAST_CONFIG = window.CONTRAST_CONFIG || {
-            orgId: '545a3bce-97c5-4732-af38-1ac459087b0a',
-            apiKey: '16s58pRXBJrIYcn9hQO9v7g3kU4Jf02o',
-            serviceKey: '0JWTRJY3994AMHTY',
-            username: 'jason.easterday@contrastsecurity.com',
-            baseUrl: 'https://eval.contrastsecurity.com/Contrast/api/ng'
-        };
+        // Load credentials from .creds file
+        await ConfigLoader.init();
 
         // Initialize MVC
         const model = new LibrarySecurityModel();
