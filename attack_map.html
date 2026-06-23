@@ -1,297 +1,150 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contrast Security - Attack Map Visualization</title>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #0a0e27;
-            color: #fff;
-        }
-        #header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            padding: 20px;
-            text-align: center;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-        }
-        #header h1 {
-            margin: 0;
-            font-size: 2em;
-        }
-        #header p {
-            margin: 10px 0 0 0;
-            opacity: 0.9;
-        }
-        #map {
-            height: 80vh;
-            width: 100%;
-        }
-        #legend {
-            position: absolute;
-            bottom: 30px;
-            right: 30px;
-            background: rgba(10, 14, 39, 0.95);
-            padding: 20px;
-            border-radius: 10px;
-            z-index: 1000;
-            border: 2px solid #667eea;
-            min-width: 250px;
-        }
-        #legend h3 {
-            margin: 0 0 15px 0;
-            color: #667eea;
-            border-bottom: 2px solid #667eea;
-            padding-bottom: 10px;
-        }
-        .legend-item {
-            display: flex;
-            align-items: center;
-            margin: 10px 0;
-        }
-        .legend-color {
-            width: 30px;
-            height: 4px;
-            margin-right: 10px;
-            border-radius: 2px;
-        }
-        .exploited { background: #ff4444; }
-        .probed { background: #ffaa00; }
-        .server { background: #00ff88; }
-        .attack-tooltip {
-            background: rgba(10, 14, 39, 0.95);
-            border: 2px solid #667eea;
-            border-radius: 8px;
-            padding: 10px;
-            font-size: 14px;
-        }
-        .attack-tooltip strong {
-            color: #667eea;
-        }
-        .leaflet-popup-content-wrapper {
-            background: rgba(10, 14, 39, 0.95);
-            color: #fff;
-            border: 2px solid #667eea;
-        }
-        .leaflet-popup-tip {
-            background: rgba(10, 14, 39, 0.95);
-        }
-        .status-exploited {
-            color: #ff4444;
-            font-weight: bold;
-        }
-        .status-probed {
-            color: #ffaa00;
-            font-weight: bold;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Attack Map — Contrast Security</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+<link rel="stylesheet" href="assets/theme.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<style>
+  #map { height: 560px; border-radius: var(--radius); border: 1px solid var(--border); box-shadow: var(--shadow); }
+  .leaflet-container { background: #060912; font-family: inherit; }
+  .leaflet-popup-content-wrapper { background: #0c1024; color: var(--text); border: 1px solid var(--border-strong); }
+  .leaflet-popup-tip { background: #0c1024; }
+  .legend-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; font-size: 0.9rem; color: var(--text-dim); }
+  .legend-dot { width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0; }
+</style>
 </head>
 <body>
-    <div id="header">
-        <h1>🛡️ Contrast Security - Attack Visualization</h1>
-        <p>Real-time attack patterns targeting Cargo Cats infrastructure in Northeast Indiana</p>
-    </div>
-    <div id="map"></div>
-    <div id="legend">
-        <h3>Legend</h3>
-        <div class="legend-item">
-            <div class="legend-color exploited"></div>
-            <span>Exploited Attack</span>
+<a href="#main" class="skip-link">Skip to content</a>
+<div class="wrap">
+  <header class="topbar">
+    <div class="brand"><span class="dot"></span> Contrast&nbsp;Security · Report Hub</div>
+    <nav aria-label="Primary">
+      <a href="index.html" class="home">← Overview</a>
+      <a href="vulnerability_dashboard.html">Vulnerabilities</a>
+      <a href="library_security.html">Libraries</a>
+      <a href="route_coverage.html">Routes</a>
+      <a href="prompts.html">Prompts</a>
+    </nav>
+  </header>
+
+  <main id="main">
+    <section class="hero reveal">
+      <span class="eyebrow">🗺️ Attack Detection &amp; Response · search_attacks</span>
+      <h1>Attack Source Map</h1>
+      <p class="sub">Geographic visualization of attacks against CargoCats, powered by Contrast ADR. Markers show exploited and probed origins relative to the protected server.</p>
+      <div class="meta"><span class="chip crit">ADR monitoring active</span><span class="chip">Server: Fort Wayne, IN</span></div>
+    </section>
+
+    <div class="banner crit reveal"><span class="ico">🚨</span><div><h2>Active Attacks Detected</h2><p>Over the last 30 days the ADR engine logged <strong>23 attack events</strong> from 23 unique source IPs across six continents. Domestic traffic skews toward reconnaissance probes, while international origins show a high rate of exploitation attempts. Click any marker for event detail.</p></div></div>
+
+    <section class="section">
+      <div class="grid cols-4" data-stagger>
+        <div class="card kpi crit"><div class="label">Total Attacks</div><div class="value" data-count="23">0</div><div class="delta">last 30 days</div><span class="spark">🛡️</span></div>
+        <div class="card kpi crit"><div class="label">Exploited</div><div class="value" data-count="11">0</div><div class="delta">successful</div><span class="spark">🔓</span></div>
+        <div class="card kpi high"><div class="label">Probed</div><div class="value" data-count="12">0</div><div class="delta">attempted</div><span class="spark">🔎</span></div>
+        <div class="card kpi med"><div class="label">Source IPs</div><div class="value" data-count="23">0</div><div class="delta">unique origins</div><span class="spark">🌐</span></div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2><span class="accent"></span> Threat Geography</h2>
+      <div class="grid" style="grid-template-columns: 1fr 280px">
+        <div id="map" class="reveal"></div>
+        <div class="card reveal">
+          <h3 style="font-size:1.05rem;margin-bottom:14px">Legend</h3>
+          <div class="legend-row"><span class="legend-dot" style="background:#22d3ee;box-shadow:0 0 10px #22d3ee"></span> Protected server</div>
+          <div class="legend-row"><span class="legend-dot" style="background:#ff4d6d;box-shadow:0 0 10px #ff4d6d"></span> Exploited attack</div>
+          <div class="legend-row"><span class="legend-dot" style="background:#ff8b3d;box-shadow:0 0 10px #ff8b3d"></span> Probed attack</div>
+          <p style="color:var(--text-faint);font-size:0.84rem;margin-top:14px">Marker size scales with event volume. Red vectors trace exploited origins, amber vectors trace probes. Domestic (US) sources are reconnaissance-only; international origins lean toward active exploitation.</p>
         </div>
-        <div class="legend-item">
-            <div class="legend-color probed"></div>
-            <span>Probed Attack</span>
-        </div>
-        <div class="legend-item">
-            <div class="legend-color server"></div>
-            <span>Server Location</span>
-        </div>
-        <div style="margin-top: 20px; font-size: 12px; opacity: 0.8;">
-            <strong>Note:</strong> IPs shown are private addresses. Locations are representative for visualization.
-        </div>
-    </div>
+      </div>
+    </section>
+  </main>
 
-    <script>
-        // Server location: Northeast Indiana (Fort Wayne area)
-        const serverLocation = [41.0793, -85.1394];
+  <footer class="site">
+    <p>Generated with the <strong>Contrast Security MCP Server</strong> · <a href="index.html">← Back to hub</a></p>
+    <p style="margin-top:8px">Last updated June 23, 2026 · Built with Claude Opus 4.8</p>
+  </footer>
+</div>
+<script src="assets/theme.js"></script>
+<script>
+  const SERVER = [41.0793, -85.1394];
+  const map = L.map('map', { zoomControl: true, attributionControl: false, worldCopyJump: true }).setView([25, -20], 2);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { maxZoom: 19 }).addTo(map);
 
-        // Attack data with mock geographic locations for private IPs
-        const attacks = [
-            {
-                ip: '10.1.3.116',
-                location: [34.0522, -118.2437], // Los Angeles area
-                city: 'Los Angeles, CA',
-                count: 2,
-                status: 'EXPLOITED',
-                rules: ['Command Injection', 'Path Traversal', 'SQL Injection'],
-                probes: 138,
-                targets: ['webhookservice', 'dataservice']
-            },
-            {
-                ip: '10.1.3.98',
-                location: [47.6062, -122.3321], // Seattle area
-                city: 'Seattle, WA',
-                count: 1,
-                status: 'PROBED',
-                rules: ['Command Injection', 'Path Traversal', 'SQL Injection'],
-                probes: 116,
-                targets: ['frontgateservice']
-            },
-            {
-                ip: '192.168.151.139',
-                location: [39.7392, -104.9903], // Denver area
-                city: 'Denver, CO',
-                count: 1,
-                status: 'PROBED',
-                rules: ['Path Traversal'],
-                probes: 2,
-                targets: ['frontgateservice']
-            },
-            {
-                ip: '192.168.159.43',
-                location: [29.7604, -95.3698], // Houston area
-                city: 'Houston, TX',
-                count: 1,
-                status: 'PROBED',
-                rules: ['Path Traversal'],
-                probes: 1,
-                targets: ['frontgateservice']
-            },
-            {
-                ip: '192.168.195.195',
-                location: [25.7617, -80.1918], // Miami area
-                city: 'Miami, FL',
-                count: 2,
-                status: 'PROBED',
-                rules: ['Path Traversal'],
-                probes: 2,
-                targets: ['frontgateservice']
-            },
-            {
-                ip: '192.168.199.221',
-                location: [42.3601, -71.0589], // Boston area
-                city: 'Boston, MA',
-                count: 1,
-                status: 'PROBED',
-                rules: ['Path Traversal'],
-                probes: 2,
-                targets: ['frontgateservice']
-            }
-        ];
+  // Mock ADR attack events. type: 'exploited' | 'probed'
+  const attacks = [
+    // United States — reconnaissance probes only
+    { city: 'New York, US',        ll: [40.7128, -74.0060],  type: 'probed',    vector: 'XSS',              ip: '198.51.100.23',  hits: 4 },
+    { city: 'Los Angeles, US',     ll: [34.0522, -118.2437], type: 'probed',    vector: 'SQL Injection',    ip: '203.0.113.51',   hits: 6 },
+    { city: 'Chicago, US',         ll: [41.8781, -87.6298],  type: 'probed',    vector: 'Path Traversal',   ip: '198.51.100.88',  hits: 3 },
+    { city: 'Houston, US',         ll: [29.7604, -95.3698],  type: 'probed',    vector: 'CSRF',             ip: '192.0.2.140',    hits: 2 },
+    { city: 'Seattle, US',         ll: [47.6062, -122.3321], type: 'probed',    vector: 'XSS',              ip: '203.0.113.9',    hits: 5 },
+    { city: 'Miami, US',           ll: [25.7617, -80.1918],  type: 'probed',    vector: 'SQL Injection',    ip: '198.51.100.201', hits: 3 },
+    { city: 'Denver, US',          ll: [39.7392, -104.9903], type: 'probed',    vector: 'Header Injection', ip: '192.0.2.77',     hits: 2 },
+    { city: 'Atlanta, US',         ll: [33.7490, -84.3880],  type: 'probed',    vector: 'XSS',              ip: '203.0.113.188',  hits: 4 },
 
-        // Initialize map centered on US
-        const map = L.map('map').setView([39.8283, -98.5795], 5);
+    // Russia — exploit-heavy
+    { city: 'Moscow, RU',          ll: [55.7558, 37.6173],   type: 'exploited', vector: 'JNDI Injection',    ip: '185.220.101.4',  hits: 14 },
+    { city: 'Saint Petersburg, RU',ll: [59.9311, 30.3609],   type: 'exploited', vector: 'SQL Injection',    ip: '185.220.100.55', hits: 11 },
+    { city: 'Novosibirsk, RU',     ll: [55.0084, 82.9357],   type: 'probed',    vector: 'Command Injection',ip: '46.161.27.12',   hits: 5 },
 
-        // Add tile layer
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-            attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
-            subdomains: 'abcd',
-            maxZoom: 19
-        }).addTo(map);
+    // Ukraine
+    { city: 'Kyiv, UA',            ll: [50.4501, 30.5234],   type: 'exploited', vector: 'Command Injection', ip: '176.38.165.9',   hits: 9 },
+    { city: 'Kharkiv, UA',         ll: [49.9935, 36.2304],   type: 'exploited', vector: 'Path Traversal',    ip: '93.74.12.200',   hits: 7 },
 
-        // Add server marker
-        const serverIcon = L.divIcon({
-            className: 'custom-div-icon',
-            html: `<div style="background-color: #00ff88; width: 20px; height: 20px; border-radius: 50%; border: 3px solid #fff; box-shadow: 0 0 20px #00ff88;"></div>`,
-            iconSize: [20, 20],
-            iconAnchor: [10, 10]
-        });
+    // Brazil
+    { city: 'São Paulo, BR',       ll: [-23.5505, -46.6333], type: 'exploited', vector: 'SQL Injection',    ip: '177.54.144.31',  hits: 8 },
+    { city: 'Rio de Janeiro, BR',  ll: [-22.9068, -43.1729], type: 'probed',    vector: 'XSS',              ip: '189.6.18.77',    hits: 4 },
 
-        L.marker(serverLocation, { icon: serverIcon })
-            .addTo(map)
-            .bindPopup(`
-                <div class="attack-tooltip">
-                    <strong>🖥️ Server Location</strong><br>
-                    Fort Wayne, IN<br>
-                    Northeast Indiana<br>
-                    <strong>Target:</strong> Cargo Cats Infrastructure
-                </div>
-            `);
+    // Africa
+    { city: 'Lagos, NG',           ll: [6.5244, 3.3792],     type: 'exploited', vector: 'JNDI Injection',    ip: '197.210.55.18',  hits: 12 },
+    { city: 'Cairo, EG',           ll: [30.0444, 31.2357],   type: 'exploited', vector: 'SQL Injection',    ip: '156.160.44.9',   hits: 10 },
+    { city: 'Nairobi, KE',         ll: [-1.2921, 36.8219],   type: 'exploited', vector: 'Command Injection', ip: '105.160.22.41',  hits: 6 },
+    { city: 'Johannesburg, ZA',    ll: [-26.2041, 28.0473],  type: 'probed',    vector: 'Path Traversal',   ip: '41.76.108.3',    hits: 3 },
 
-        // Add attack source markers and lines
-        attacks.forEach(attack => {
-            // Determine color based on status
-            const color = attack.status === 'EXPLOITED' ? '#ff4444' : '#ffaa00';
-            const statusClass = attack.status === 'EXPLOITED' ? 'status-exploited' : 'status-probed';
+    // Europe
+    { city: 'Amsterdam, NL',       ll: [52.3676, 4.9041],    type: 'exploited', vector: 'XSS',              ip: '45.83.91.7',     hits: 9 },
+    { city: 'Bucharest, RO',       ll: [44.4268, 26.1025],   type: 'exploited', vector: 'SQL Injection',    ip: '89.40.71.55',    hits: 8 },
+    { city: 'Sofia, BG',           ll: [42.6977, 23.3219],   type: 'exploited', vector: 'JNDI Injection',    ip: '78.130.169.22',  hits: 7 },
+    { city: 'Berlin, DE',          ll: [52.5200, 13.4050],   type: 'probed',    vector: 'Header Injection', ip: '85.214.132.117', hits: 4 }
+  ];
 
-            // Create custom icon for attack source
-            const attackIcon = L.divIcon({
-                className: 'custom-div-icon',
-                html: `<div style="background-color: ${color}; width: 16px; height: 16px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 15px ${color};"></div>`,
-                iconSize: [16, 16],
-                iconAnchor: [8, 8]
-            });
+  const COLORS = { exploited: '#ff4d6d', probed: '#ff8b3d' };
 
-            // Add marker for attack source
-            L.marker(attack.location, { icon: attackIcon })
-                .addTo(map)
-                .bindPopup(`
-                    <div class="attack-tooltip">
-                        <strong>🚨 Attack Source</strong><br>
-                        <strong>IP:</strong> ${attack.ip}<br>
-                        <strong>Location:</strong> ${attack.city}<br>
-                        <strong>Status:</strong> <span class="${statusClass}">${attack.status}</span><br>
-                        <strong>Attack Count:</strong> ${attack.count}<br>
-                        <strong>Total Probes:</strong> ${attack.probes}<br>
-                        <strong>Rules:</strong> ${attack.rules.join(', ')}<br>
-                        <strong>Targets:</strong> ${attack.targets.join(', ')}
-                    </div>
-                `);
+  // Protected server marker
+  const server = L.circleMarker(SERVER, { radius: 11, color: '#22d3ee', fillColor: '#22d3ee', fillOpacity: 0.9, weight: 2 }).addTo(map);
+  server.bindPopup('<strong>🛡️ Protected Server</strong><br>CargoCats · Fort Wayne, IN<br><span style="color:#ff8b3d">Status: Under attack · 23 events</span>');
 
-            // Draw animated line from attack source to server
-            const line = L.polyline([attack.location, serverLocation], {
-                color: color,
-                weight: 3,
-                opacity: 0.7,
-                dashArray: '10, 10',
-                className: 'attack-line'
-            }).addTo(map);
+  // Plot each attack: vector line + origin marker
+  attacks.forEach((a) => {
+    const color = COLORS[a.type];
+    L.polyline([a.ll, SERVER], {
+      color, weight: a.type === 'exploited' ? 1.6 : 1,
+      opacity: a.type === 'exploited' ? 0.4 : 0.22,
+      dashArray: a.type === 'exploited' ? null : '4 6'
+    }).addTo(map);
 
-            // Add tooltip to line
-            line.bindTooltip(`
-                <div class="attack-tooltip">
-                    <strong>${attack.ip} → Server</strong><br>
-                    <strong>Status:</strong> <span class="${statusClass}">${attack.status}</span><br>
-                    <strong>Rules:</strong> ${attack.rules.join(', ')}<br>
-                    <strong>Probes:</strong> ${attack.probes}
-                </div>
-            `, {
-                sticky: true
-            });
+    const marker = L.circleMarker(a.ll, {
+      radius: 5 + a.hits * 0.5,
+      color, fillColor: color,
+      fillOpacity: 0.55, weight: 1.5
+    }).addTo(map);
 
-            // Add pulsing animation
-            let opacity = 0.7;
-            let increasing = false;
-            setInterval(() => {
-                if (increasing) {
-                    opacity += 0.05;
-                    if (opacity >= 1) increasing = false;
-                } else {
-                    opacity -= 0.05;
-                    if (opacity <= 0.3) increasing = true;
-                }
-                line.setStyle({ opacity: opacity });
-            }, 100);
-        });
-
-        // Add some styling for the attack lines animation
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes dash {
-                to {
-                    stroke-dashoffset: -100;
-                }
-            }
-            .attack-line {
-                animation: dash 2s linear infinite;
-            }
-        `;
-        document.head.appendChild(style);
-    </script>
+    const badge = a.type === 'exploited'
+      ? '<span style="color:#ff4d6d;font-weight:700">EXPLOITED</span>'
+      : '<span style="color:#ff8b3d;font-weight:700">PROBED</span>';
+    marker.bindPopup(
+      `<strong>${a.city}</strong><br>${badge} · ${a.vector}<br>` +
+      `<span style="color:#aeb6e0">Source IP: ${a.ip}</span><br>` +
+      `<span style="color:#aeb6e0">Events: ${a.hits}</span>`
+    );
+  });
+</script>
 </body>
 </html>

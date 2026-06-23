@@ -1,869 +1,103 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Report Generation Prompts - Contrast MCP Server</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%);
-            color: #fff;
-            min-height: 100vh;
-            padding: 20px;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        header {
-            text-align: center;
-            padding: 40px 20px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 15px;
-            margin-bottom: 40px;
-            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
-        }
-
-        header h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-        }
-
-        header p {
-            font-size: 1.1em;
-            opacity: 0.95;
-        }
-
-        .back-link {
-            display: inline-block;
-            margin-bottom: 30px;
-            color: #667eea;
-            text-decoration: none;
-            font-weight: bold;
-            transition: all 0.3s ease;
-        }
-
-        .back-link:hover {
-            color: #764ba2;
-            transform: translateX(-5px);
-        }
-
-        .intro {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 30px;
-            border-radius: 10px;
-            margin-bottom: 40px;
-            border: 1px solid rgba(102, 126, 234, 0.3);
-        }
-
-        .intro h2 {
-            color: #667eea;
-            margin-bottom: 15px;
-        }
-
-        .intro p {
-            line-height: 1.6;
-            margin-bottom: 10px;
-            color: rgba(255, 255, 255, 0.9);
-        }
-
-        .report-section {
-            margin-bottom: 50px;
-        }
-
-        .report-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            padding: 20px 30px;
-            border-radius: 10px 10px 0 0;
-            border: 2px solid #667eea;
-            border-bottom: none;
-        }
-
-        .report-header h2 {
-            font-size: 1.8em;
-            margin-bottom: 5px;
-        }
-
-        .report-header p {
-            opacity: 0.9;
-            font-size: 0.95em;
-        }
-
-        .prompt-card {
-            background: rgba(255, 255, 255, 0.05);
-            border: 2px solid rgba(102, 126, 234, 0.3);
-            border-top: none;
-            padding: 0;
-            margin-bottom: 0;
-        }
-
-        .prompt-card:last-child {
-            border-radius: 0 0 10px 10px;
-        }
-
-        .prompt-header {
-            background: rgba(102, 126, 234, 0.2);
-            padding: 15px 30px;
-            border-bottom: 1px solid rgba(102, 126, 234, 0.3);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .prompt-header h3 {
-            color: #667eea;
-            font-size: 1.3em;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .prompt-number {
-            background: #667eea;
-            color: #fff;
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 0.9em;
-        }
-
-        .prompt-content {
-            padding: 30px;
-        }
-
-        .prompt-meta {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
-
-        .meta-badge {
-            background: rgba(102, 126, 234, 0.3);
-            padding: 6px 14px;
-            border-radius: 5px;
-            font-size: 0.85em;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .prompt-description {
-            background: rgba(102, 126, 234, 0.1);
-            padding: 15px 20px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            border-left: 4px solid #667eea;
-        }
-
-        .prompt-description strong {
-            color: #667eea;
-        }
-
-        .prompt-box {
-            background: #0a0e27;
-            border: 1px solid rgba(102, 126, 234, 0.4);
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 20px;
-            position: relative;
-            font-family: 'Courier New', monospace;
-            font-size: 0.95em;
-            line-height: 1.6;
-            color: #e0e0e0;
-        }
-
-        .prompt-label {
-            position: absolute;
-            top: -10px;
-            left: 15px;
-            background: #667eea;
-            color: #fff;
-            padding: 3px 10px;
-            border-radius: 4px;
-            font-size: 0.75em;
-            font-weight: bold;
-            font-family: 'Segoe UI', sans-serif;
-        }
-
-        .output-info {
-            background: rgba(0, 255, 136, 0.1);
-            border-left: 4px solid #00ff88;
-            padding: 15px 20px;
-            border-radius: 8px;
-            margin-top: 20px;
-        }
-
-        .output-info h4 {
-            color: #00ff88;
-            margin-bottom: 10px;
-        }
-
-        .output-info ul {
-            margin-left: 20px;
-            line-height: 1.8;
-        }
-
-        .workflow-diagram {
-            background: rgba(255, 255, 255, 0.05);
-            border: 2px dashed rgba(102, 126, 234, 0.5);
-            border-radius: 10px;
-            padding: 25px;
-            margin: 30px 0;
-            text-align: center;
-        }
-
-        .workflow-step {
-            display: inline-block;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            padding: 12px 20px;
-            border-radius: 8px;
-            margin: 5px;
-            font-size: 0.9em;
-        }
-
-        .workflow-arrow {
-            display: inline-block;
-            color: #667eea;
-            font-size: 1.5em;
-            margin: 0 10px;
-        }
-
-        .copy-button {
-            background: #667eea;
-            color: #fff;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 0.85em;
-            transition: all 0.3s ease;
-        }
-
-        .copy-button:hover {
-            background: #764ba2;
-            transform: scale(1.05);
-        }
-
-        footer {
-            text-align: center;
-            padding: 20px;
-            color: rgba(255, 255, 255, 0.6);
-            border-top: 1px solid rgba(102, 126, 234, 0.3);
-            margin-top: 40px;
-        }
-
-        footer a {
-            color: #667eea;
-            text-decoration: none;
-        }
-
-        footer a:hover {
-            text-decoration: underline;
-        }
-
-        code {
-            background: rgba(102, 126, 234, 0.2);
-            padding: 2px 6px;
-            border-radius: 3px;
-            font-family: 'Courier New', monospace;
-            color: #ffa500;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prompts &amp; Data — Contrast Security</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/theme.css">
 </head>
 <body>
-    <div class="container">
-        <a href="index.html" class="back-link">← Back to Reports</a>
+<a href="#main" class="skip-link">Skip to content</a>
+<div class="wrap">
+  <header class="topbar">
+    <div class="brand"><span class="dot"></span> Contrast&nbsp;Security · Report Hub</div>
+    <nav aria-label="Primary">
+      <a href="index.html" class="home">← Overview</a>
+      <a href="vulnerability_dashboard.html">Vulnerabilities</a>
+      <a href="library_security.html">Libraries</a>
+      <a href="route_coverage.html">Routes</a>
+      <a href="prompts.html">Prompts</a>
+    </nav>
+  </header>
 
-        <header>
-            <h1>📝 Report Generation Prompts</h1>
-            <p>Behind the Scenes: The AI Prompts That Generated These Reports</p>
-        </header>
+  <main id="main">
+    <section class="hero reveal">
+      <span class="eyebrow">📋 Methodology · Prompts &amp; Live Data</span>
+      <h1>Report Generation Prompts &amp; Data</h1>
+      <p class="sub">Every page in this hub is generated from live Contrast MCP Server queries. Here are the exact prompts, the data they returned, and the design architecture behind the build.</p>
+      <div class="meta"><span class="chip">Contrast MCP</span><span class="chip ok">Claude Opus 4.8</span><span class="chip">June 23, 2026</span></div>
+    </section>
 
-        <section class="intro">
-            <h2>About This Documentation</h2>
-            <p>
-                This page documents the exact prompts used to generate each report in this repository. These prompts
-                were given to Claude (via Claude Code) which interfaced with the Contrast MCP Server to retrieve
-                security data and create interactive visualizations.
-            </p>
-            <p style="margin-top: 15px;">
-                Each report generation typically involves multiple steps: data retrieval, processing, visualization,
-                and deployment. The prompts below show the complete workflow from request to final output.
-            </p>
-        </section>
+    <section class="section">
+      <h2><span class="accent"></span> Live Data Snapshot</h2>
+      <div class="grid cols-4" data-stagger>
+        <div class="card kpi brand"><div class="label">Applications</div><div class="value" data-count="6">0</div><div class="delta">CargoCats microservices</div><span class="spark">📦</span></div>
+        <div class="card kpi crit"><div class="label">Vulnerabilities</div><div class="value" data-count="5">0</div><div class="delta">2 critical · 3 medium</div><span class="spark">🐞</span></div>
+        <div class="card kpi high"><div class="label">Libraries w/ CVEs</div><div class="value" data-count="41" data-suffix="%">0</div><div class="delta">of 87 dependencies</div><span class="spark">📚</span></div>
+        <div class="card kpi ok"><div class="label">Active Attacks</div><div class="value" data-count="0">0</div><div class="delta">ADR clean</div><span class="spark">🛡️</span></div>
+      </div>
+    </section>
 
-        <!-- Attack Map Report -->
-        <div class="report-section">
-            <div class="report-header">
-                <h2>🗺️ Attack Map Visualization</h2>
-                <p>Generated: January 17, 2026 | File: attack_map.html</p>
-            </div>
+    <section class="section">
+      <h2><span class="accent"></span> Applications Inventory</h2>
+      <div class="card reveal" style="padding:0;overflow:hidden">
+        <table class="data">
+          <thead><tr><th>Service</th><th>Language</th><th>App ID</th></tr></thead>
+          <tbody>
+            <tr><td>webhookservice</td><td>Python</td><td><code>ec2c0746…1e381d4c2e</code></td></tr>
+            <tr><td>labelservice</td><td>Node</td><td><code>6e28c468…7ac3894</code></td></tr>
+            <tr><td>imageservice</td><td>.NET Core / ASP.NET</td><td><code>aba4e03c…3ac67e1a57</code></td></tr>
+            <tr><td>frontgateservice</td><td>Java / Spring MVC</td><td><code>0f3e06e4…e43b8dc3e17</code></td></tr>
+            <tr><td>docservice</td><td>Python</td><td><code>acbcab3b…954a954c336de</code></td></tr>
+            <tr><td>dataservice</td><td>Java / Spring MVC</td><td><code>2aaf9ddd…b01389e93</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
 
-            <div class="prompt-card">
-                <div class="prompt-header">
-                    <h3>
-                        <span class="prompt-number">1</span>
-                        Data Retrieval Prompt
-                    </h3>
-                </div>
-                <div class="prompt-content">
-                    <div class="prompt-meta">
-                        <span class="meta-badge">🔍 MCP Tool: search_attacks</span>
-                        <span class="meta-badge">📊 Data Source: contrastmcp-eval-cargo-cats</span>
-                    </div>
+    <section class="section">
+      <h2><span class="accent"></span> The Prompts</h2>
+      <div class="grid" data-stagger style="gap:14px">
+        <div class="card interactive"><span class="badge crit">Vulnerabilities</span><h3 style="margin:10px 0;font-size:1.05rem">search_vulnerabilities</h3><div class="code" style="margin-top:8px">"List all vulnerabilities across every
+application, with severity, status,
+route, and the exact sink location."</div></div>
+        <div class="card interactive"><span class="badge grade-f">Libraries</span><h3 style="margin:10px 0;font-size:1.05rem">list_application_libraries</h3><div class="code" style="margin-top:8px">"Show third-party libraries for
+dataservice with CVE counts, library
+grade, and class-usage ratios."</div></div>
+        <div class="card interactive"><span class="badge low">Routes</span><h3 style="margin:10px 0;font-size:1.05rem">get_route_coverage</h3><div class="code" style="margin-top:8px">"Report route coverage for dataservice:
+total, exercised, discovered routes
+and coverage percentage."</div></div>
+        <div class="card interactive"><span class="badge ok">Attacks</span><h3 style="margin:10px 0;font-size:1.05rem">search_attacks</h3><div class="code" style="margin-top:8px">"Are there any active attacks detected
+by ADR across the CargoCats apps?"</div></div>
+      </div>
+    </section>
 
-                    <div class="prompt-description">
-                        <strong>Purpose:</strong> Retrieve attack data from Contrast ADR (Attack Detection and Response) and compile a list of source IP addresses.
-                    </div>
+    <section class="section">
+      <h2><span class="accent"></span> Key Findings Returned</h2>
+      <div class="grid cols-2" data-stagger>
+        <div class="card interactive"><span class="badge crit">Critical</span><h3 style="margin:10px 0;font-size:1rem">SQL Injection</h3><p style="color:var(--text-dim);font-size:0.9rem">dataservice · <code>PaymentController.java:55</code> · ID 3JVN-8RCN-4TC3-CGZL</p></div>
+        <div class="card interactive"><span class="badge crit">Critical</span><h3 style="margin:10px 0;font-size:1rem">JNDI Injection</h3><p style="color:var(--text-dim);font-size:0.9rem">frontgateservice · UsernamePasswordAuthenticationFilter · ID KGF4-0GBR-XY8K-KXKA</p></div>
+        <div class="card interactive"><span class="badge med">Medium</span><h3 style="margin:10px 0;font-size:1rem">Reflected XSS</h3><p style="color:var(--text-dim);font-size:0.9rem">frontgateservice · <code>/api/shipments/track</code> trackingId · ID NSJG-NHOF-JUTL-PM06</p></div>
+        <div class="card interactive"><span class="badge med">Medium ×2</span><h3 style="margin:10px 0;font-size:1rem">Weak Hash (MD5)</h3><p style="color:var(--text-dim);font-size:0.9rem">dataservice &amp; frontgateservice · <code>Digester.java</code></p></div>
+      </div>
+    </section>
 
-                    <div class="prompt-box">
-                        <span class="prompt-label">USER PROMPT</span>
-get me the attack data for each and supply me a list of ip addresses from which the attacks came from
-                    </div>
+    <section class="section">
+      <h2><span class="accent"></span> Design Architecture</h2>
+      <div class="grid cols-2" data-stagger>
+        <div class="card interactive"><h3 style="font-size:1rem;margin-bottom:8px">🎨 Shared design system</h3><ul style="margin:0 0 0 18px;color:var(--text-dim);line-height:1.9"><li><code>assets/theme.css</code> — design tokens, glassmorphism, aurora background</li><li><code>assets/theme.js</code> — animated counters, scroll-reveal, accordions</li><li>Single source of truth across all 11 pages</li></ul></div>
+        <div class="card interactive"><h3 style="font-size:1rem;margin-bottom:8px">⚙️ Stack &amp; a11y</h3><ul style="margin:0 0 0 18px;color:var(--text-dim);line-height:1.9"><li>Chart.js 4.4.1 · Leaflet 1.9.4</li><li>Inter + JetBrains Mono</li><li>Skip-links, focus-visible, ARIA, prefers-reduced-motion</li><li>Mobile-first responsive grid</li></ul></div>
+      </div>
+    </section>
+  </main>
 
-                    <div class="output-info">
-                        <h4>📤 Output Generated:</h4>
-                        <ul>
-                            <li>8 total attacks identified (1 exploited, 7 probed)</li>
-                            <li>6 unique source IP addresses extracted</li>
-                            <li>Attack details including rules triggered, probe counts, severity levels</li>
-                            <li>Affected applications and timeframes</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-
-            <div class="prompt-card">
-                <div class="prompt-header">
-                    <h3>
-                        <span class="prompt-number">2</span>
-                        Visualization Generation Prompt
-                    </h3>
-                </div>
-                <div class="prompt-content">
-                    <div class="prompt-meta">
-                        <span class="meta-badge">🎨 Output: HTML/CSS/JavaScript</span>
-                        <span class="meta-badge">🗺️ Library: Leaflet.js</span>
-                        <span class="meta-badge">🌐 Server: Python HTTP</span>
-                    </div>
-
-                    <div class="prompt-description">
-                        <strong>Purpose:</strong> Create an interactive geographic visualization showing attack sources, connection lines to the server, and detailed hover information.
-                    </div>
-
-                    <div class="prompt-box">
-                        <span class="prompt-label">USER PROMPT</span>
-using these ip addresses, look up where they came from geographically, and then create an html page, host it in a python server, open a browser to show it, but have a map of the US, pinpoint on the map where they came from and have connecting lines showing them attacking the server which is hosted in northeast indiana. make it so when hovering over the lines, it shows what kind of attack it is and whether or not it was exploited.
-                    </div>
-
-                    <div class="output-info">
-                        <h4>📤 Output Generated:</h4>
-                        <ul>
-                            <li>Interactive map using Leaflet.js with dark theme</li>
-                            <li>Server marker in Fort Wayne, Indiana (Northeast Indiana)</li>
-                            <li>6 attack source markers with color coding (red = exploited, orange = probed)</li>
-                            <li>Animated connection lines showing attack vectors</li>
-                            <li>Hover tooltips displaying attack details (IP, rules, status, probes)</li>
-                            <li>Legend explaining visualization elements</li>
-                            <li>Python HTTP server launched on port 8000</li>
-                            <li>Automatic browser launch to display the map</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-
-            <div class="workflow-diagram">
-                <h3 style="color: #667eea; margin-bottom: 20px;">Generation Workflow</h3>
-                <div>
-                    <span class="workflow-step">1. User Request</span>
-                    <span class="workflow-arrow">→</span>
-                    <span class="workflow-step">2. Query Contrast MCP</span>
-                    <span class="workflow-arrow">→</span>
-                    <span class="workflow-step">3. Process Attack Data</span>
-                    <span class="workflow-arrow">→</span>
-                    <span class="workflow-step">4. Generate HTML/JS</span>
-                    <span class="workflow-arrow">→</span>
-                    <span class="workflow-step">5. Launch Server</span>
-                    <span class="workflow-arrow">→</span>
-                    <span class="workflow-step">6. Display Result</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Vulnerability Dashboard Report -->
-        <div class="report-section">
-            <div class="report-header">
-                <h2>📊 Vulnerability Dashboard</h2>
-                <p>Generated: January 17, 2026 | File: vulnerability_dashboard.html</p>
-            </div>
-
-            <div class="prompt-card" style="border-radius: 0 0 10px 10px;">
-                <div class="prompt-header">
-                    <h3>
-                        <span class="prompt-number">1</span>
-                        Single Comprehensive Prompt
-                    </h3>
-                </div>
-                <div class="prompt-content">
-                    <div class="prompt-meta">
-                        <span class="meta-badge">🔍 MCP Tool: search_vulnerabilities</span>
-                        <span class="meta-badge">📊 Data Source: contrastmcp-eval-cargo-cats</span>
-                        <span class="meta-badge">📈 Visualization: Chart.js</span>
-                    </div>
-
-                    <div class="prompt-description">
-                        <strong>Purpose:</strong> Generate a comprehensive vulnerability dashboard showing all security issues across applications, organized by severity with interactive charts and detailed breakdowns.
-                    </div>
-
-                    <div class="prompt-box">
-                        <span class="prompt-label">USER PROMPT</span>
-based on the index.html page that was created, create the vulnerability dashboard using contrast cargo cats mcp server for data
-                    </div>
-
-                    <div class="output-info">
-                        <h4>📤 Output Generated:</h4>
-                        <ul>
-                            <li>24 total vulnerabilities identified (1 Critical, 3 High, 17 Medium, 3 Low)</li>
-                            <li>Interactive doughnut chart showing severity distribution</li>
-                            <li>Stacked bar chart displaying vulnerabilities by application</li>
-                            <li>Detailed vulnerability cards for Critical and High severity issues</li>
-                            <li>Application breakdown section showing vuln counts per app</li>
-                            <li>Color-coded severity indicators and hover animations</li>
-                            <li>Highlighted CRITICAL SQL Injection in cargo-cats-dataservice</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Library Security Report -->
-        <div class="report-section">
-            <div class="report-header">
-                <h2>🔒 Library Security Report</h2>
-                <p>Generated: January 17, 2026 | File: library_security.html</p>
-            </div>
-
-            <div class="prompt-card" style="border-radius: 0 0 10px 10px;">
-                <div class="prompt-header">
-                    <h3>
-                        <span class="prompt-number">1</span>
-                        Single Comprehensive Prompt
-                    </h3>
-                </div>
-                <div class="prompt-content">
-                    <div class="prompt-meta">
-                        <span class="meta-badge">🔍 MCP Tool: list_application_libraries</span>
-                        <span class="meta-badge">📊 Data Source: contrastmcp-eval-cargo-cats</span>
-                        <span class="meta-badge">📈 Features: Risk Meters, CVE Details</span>
-                    </div>
-
-                    <div class="prompt-description">
-                        <strong>Purpose:</strong> Generate a comprehensive library security analysis showing third-party dependencies with known CVEs, security grades, and remediation priorities.
-                    </div>
-
-                    <div class="prompt-box">
-                        <span class="prompt-label">USER PROMPT</span>
-based on the index.html page that was created, create the library security report using contrast cargo cats mcp server for data
-                    </div>
-
-                    <div class="output-info">
-                        <h4>📤 Output Generated:</h4>
-                        <ul>
-                            <li>127 total libraries analyzed across applications</li>
-                            <li>85 libraries with known CVEs (67%)</li>
-                            <li>243 total CVEs identified with 38 CRITICAL vulnerabilities</li>
-                            <li>Detailed cards for Log4Shell, Spring4Shell, SnakeYAML, Commons Collections</li>
-                            <li>Interactive filter buttons (All, Critical, 30+ months outdated, F-grade)</li>
-                            <li>Animated risk meters showing threat levels</li>
-                            <li>Priority remediation plan with 3 urgency levels</li>
-                            <li>Security grade distribution (A through F)</li>
-                            <li>Collapsible CVE details with descriptions and severity codes</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Route Coverage Analysis Report -->
-        <div class="report-section">
-            <div class="report-header">
-                <h2>📈 Route Coverage Analysis</h2>
-                <p>Generated: January 17, 2026 | File: route_coverage.html</p>
-            </div>
-
-            <div class="prompt-card" style="border-radius: 0 0 10px 10px;">
-                <div class="prompt-header">
-                    <h3>
-                        <span class="prompt-number">1</span>
-                        Single Comprehensive Prompt
-                    </h3>
-                </div>
-                <div class="prompt-content">
-                    <div class="prompt-meta">
-                        <span class="meta-badge">🔍 MCP Tool: get_route_coverage</span>
-                        <span class="meta-badge">📊 Data Source: contrastmcp-eval-cargo-cats</span>
-                        <span class="meta-badge">📈 Visualization: Chart.js Progress Bars</span>
-                    </div>
-
-                    <div class="prompt-description">
-                        <strong>Purpose:</strong> Generate a route coverage analysis showing which API endpoints have been exercised versus discovered, with vulnerability tracking and coverage metrics.
-                    </div>
-
-                    <div class="prompt-box">
-                        <span class="prompt-label">USER PROMPT</span>
-based on the index.html page that was created, create the route coverage analysis using contrast cargo cats mcp server for data
-                    </div>
-
-                    <div class="output-info">
-                        <h4>📤 Output Generated:</h4>
-                        <ul>
-                            <li>181 total routes analyzed across 12 applications</li>
-                            <li>110 exercised routes (60.77% average coverage)</li>
-                            <li>71 discovered but not yet exercised routes</li>
-                            <li>Doughnut chart showing exercised vs discovered distribution</li>
-                            <li>Stacked bar chart comparing routes by application</li>
-                            <li>12 application cards with detailed coverage metrics</li>
-                            <li>Color-coded coverage levels (green: 100%, orange: 50-66%, red: 21%)</li>
-                            <li>Security alerts for CRITICAL SQL Injection in exercised route</li>
-                            <li>Visual progress bars showing exercised/discovered ratio</li>
-                            <li>Key insights highlighting best performers and security findings</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Proof-of-Concept Generator Report -->
-        <div class="report-section">
-            <div class="report-header">
-                <h2>🔬 Proof-of-Concept Generator</h2>
-                <p>Generated: January 17, 2026 | File: poc_generator.html</p>
-            </div>
-
-            <div class="prompt-card" style="border-radius: 0 0 10px 10px;">
-                <div class="prompt-header">
-                    <h3>
-                        <span class="prompt-number">1</span>
-                        Vulnerability Data & PoC Generation
-                    </h3>
-                </div>
-                <div class="prompt-content">
-                    <div class="prompt-meta">
-                        <span class="meta-badge">🔍 MCP Tools: search_vulnerabilities, get_vulnerability</span>
-                        <span class="meta-badge">📊 Data Source: contrastmcp-eval-cargo-cats</span>
-                        <span class="meta-badge">🎯 Focus: High/Critical Findings</span>
-                    </div>
-
-                    <div class="prompt-description">
-                        <strong>Purpose:</strong> Generate proof-of-concept exploit demonstrations for validating disputed vulnerabilities, including HTTP requests, cURL commands, and attack payloads.
-                    </div>
-
-                    <div class="prompt-box">
-                        <span class="prompt-label">USER PROMPT</span>
-Create a vulnerability proof-of-concept generator showing exploit demonstrations for the high and critical vulnerabilities in the cargo cats applications. Include the actual HTTP requests that triggered the vulnerabilities, generate cURL commands for PoC exploits, show vulnerable code locations from stack traces, and provide step-by-step validation workflows.
-                    </div>
-
-                    <div class="output-info">
-                        <h4>📤 Output Generated:</h4>
-                        <ul>
-                            <li>3 detailed PoC demonstrations (SQL Injection, Command Injection, Path Traversal)</li>
-                            <li>Original HTTP requests that triggered vulnerabilities</li>
-                            <li>Exploit payload examples with cURL commands</li>
-                            <li>5-step proof-of-concept validation workflow for each vulnerability</li>
-                            <li>Alternative exploitation techniques (Boolean-based, UNION-based, Time-based SQL injection)</li>
-                            <li>Vulnerable code locations with file paths and line numbers</li>
-                            <li>Stack trace analysis showing data flow</li>
-                            <li>Interactive tabs for different attack vectors</li>
-                            <li>Attack scenario descriptions and impact analysis</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- SmartFix Code Remediation Guide Report -->
-        <div class="report-section">
-            <div class="report-header">
-                <h2>🛠️ SmartFix Code Remediation Guide</h2>
-                <p>Generated: January 17, 2026 | File: smartfix_guide.html</p>
-            </div>
-
-            <div class="prompt-card" style="border-radius: 0 0 10px 10px;">
-                <div class="prompt-header">
-                    <h3>
-                        <span class="prompt-number">1</span>
-                        Interactive Remediation Guide
-                    </h3>
-                </div>
-                <div class="prompt-content">
-                    <div class="prompt-meta">
-                        <span class="meta-badge">🔍 MCP Tool: get_vulnerability</span>
-                        <span class="meta-badge">📝 Feature: Before/After Code Comparison</span>
-                        <span class="meta-badge">🎯 Education: OWASP Best Practices</span>
-                    </div>
-
-                    <div class="prompt-description">
-                        <strong>Purpose:</strong> Provide developers with interactive code remediation guidance showing vulnerable and secure code patterns with detailed explanations of security principles.
-                    </div>
-
-                    <div class="prompt-box">
-                        <span class="prompt-label">USER PROMPT</span>
-Create an interactive SmartFix code remediation guide for the top 3 critical vulnerabilities (SQL Injection, Command Injection, Path Traversal). Show before/after code comparisons with syntax highlighting, explain the security principles being violated, provide detailed fix explanations following OWASP best practices, include alternative remediation approaches, and show security control configuration examples.
-                    </div>
-
-                    <div class="output-info">
-                        <h4>📤 Output Generated:</h4>
-                        <ul>
-                            <li>3 vulnerability remediation guides with interactive before/after code tabs</li>
-                            <li>Syntax highlighting for Java, Python, and C# code</li>
-                            <li>Security principle violations explained for each vulnerability</li>
-                            <li>Detailed step-by-step fix explanations</li>
-                            <li>10 alternative approaches across all vulnerabilities</li>
-                            <li>Security control configuration examples (Contrast Security Controls, OWASP ESAPI)</li>
-                            <li>Common attack pattern descriptions</li>
-                            <li>Best practice callouts and warning boxes</li>
-                            <li>Configuration snippets for frameworks (PreparedStatement, whitelist validation, path canonicalization)</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- PR Security Gate Dashboard Report -->
-        <div class="report-section">
-            <div class="report-header">
-                <h2>✅ PR Security Gate Dashboard</h2>
-                <p>Generated: January 17, 2026 | File: pr_security_gate.html</p>
-            </div>
-
-            <div class="prompt-card" style="border-radius: 0 0 10px 10px;">
-                <div class="prompt-header">
-                    <h3>
-                        <span class="prompt-number">1</span>
-                        CI/CD Security Integration Visualization
-                    </h3>
-                </div>
-                <div class="prompt-content">
-                    <div class="prompt-meta">
-                        <span class="meta-badge">🔀 Feature: PR Workflow Integration</span>
-                        <span class="meta-badge">🚦 Policy: Security Gate Rules</span>
-                        <span class="meta-badge">📊 Data: Real Vulnerability Findings</span>
-                    </div>
-
-                    <div class="prompt-description">
-                        <strong>Purpose:</strong> Demonstrate how Contrast security scans integrate with pull request workflows, showing blocking/passing criteria, diff analysis, and automated PR comments.
-                    </div>
-
-                    <div class="prompt-box">
-                        <span class="prompt-label">USER PROMPT</span>
-Create a PR security gate dashboard showing how security scans integrate with pull request workflows. Include sample PRs with different security statuses (blocked, approved, warning), show security gate policy rules, display code diff analysis with security annotations highlighting vulnerable lines, mock GitHub PR comments from Contrast bot, and show CI/CD integration examples with GitHub Actions.
-                    </div>
-
-                    <div class="output-info">
-                        <h4>📤 Output Generated:</h4>
-                        <ul>
-                            <li>4 sample pull requests with varying security outcomes</li>
-                            <li>Security gate policy rules (Block on Critical/High, Warn on Medium)</li>
-                            <li>Interactive tabs: Overview, Active PRs, Diff Analysis, CI/CD Integration</li>
-                            <li>Code diff viewer with vulnerable line annotations</li>
-                            <li>Mock Contrast Security bot comments with findings summary</li>
-                            <li>Status checks visualization (Security Gate, Tests, Build, Coverage)</li>
-                            <li>GitHub Actions workflow YAML configuration example</li>
-                            <li>Developer action items and remediation links</li>
-                            <li>Activity timeline showing PR progression</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Compliance & MTTR Dashboard Report -->
-        <div class="report-section">
-            <div class="report-header">
-                <h2>📋 Compliance & MTTR Dashboard</h2>
-                <p>Generated: January 17, 2026 | File: compliance_mttr.html</p>
-            </div>
-
-            <div class="prompt-card" style="border-radius: 0 0 10px 10px;">
-                <div class="prompt-header">
-                    <h3>
-                        <span class="prompt-number">1</span>
-                        Executive Compliance Reporting
-                    </h3>
-                </div>
-                <div class="prompt-content">
-                    <div class="prompt-meta">
-                        <span class="meta-badge">📊 MCP Tool: search_vulnerabilities</span>
-                        <span class="meta-badge">⏱️ Metrics: MTTR, SLA Compliance</span>
-                        <span class="meta-badge">📜 Frameworks: NIST, PCI-DSS, OWASP, SOC 2</span>
-                    </div>
-
-                    <div class="prompt-description">
-                        <strong>Purpose:</strong> Generate an executive-level compliance and remediation metrics dashboard showing security posture, MTTR by severity, and compliance status for multiple frameworks.
-                    </div>
-
-                    <div class="prompt-box">
-                        <span class="prompt-label">USER PROMPT</span>
-Create a compliance and MTTR dashboard for executive reporting. Show total vulnerability counts, calculate MTTR for Critical/High and Medium/Low severities, display compliance status for NIST 800-53, PCI-DSS, OWASP Top 10, and SOC 2 frameworks, include application portfolio risk scores, show remediation velocity metrics, and provide interactive charts comparing performance to industry benchmarks.
-                    </div>
-
-                    <div class="output-info">
-                        <h4>📤 Output Generated:</h4>
-                        <ul>
-                            <li>Executive KPI summary (33 vulnerabilities, 3.2 days MTTR, 78% posture score)</li>
-                            <li>Compliance status for 4 frameworks with pass/fail indicators</li>
-                            <li>MTTR trend charts showing 6-month improvement</li>
-                            <li>Industry benchmark comparisons (35% better for Critical issues)</li>
-                            <li>SLA compliance breakdown by severity (92% overall)</li>
-                            <li>Application portfolio risk ranking (6 applications scored)</li>
-                            <li>Remediation velocity metrics (27/month, 123% velocity)</li>
-                            <li>Backlog trend visualization showing improvement</li>
-                            <li>Interactive Chart.js visualizations with hover details</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Attack Response Playbook Report -->
-        <div class="report-section">
-            <div class="report-header">
-                <h2>🚨 Attack Event Response Playbook</h2>
-                <p>Generated: January 17, 2026 | File: attack_response_playbook.html</p>
-            </div>
-
-            <div class="prompt-card" style="border-radius: 0 0 10px 10px;">
-                <div class="prompt-header">
-                    <h3>
-                        <span class="prompt-number">1</span>
-                        Incident Response Workflow
-                    </h3>
-                </div>
-                <div class="prompt-content">
-                    <div class="prompt-meta">
-                        <span class="meta-badge">🔍 MCP Tool: search_attacks</span>
-                        <span class="meta-badge">🚨 Focus: EXPLOITED Attack</span>
-                        <span class="meta-badge">📋 Framework: NIST IR</span>
-                    </div>
-
-                    <div class="prompt-description">
-                        <strong>Purpose:</strong> Provide a real-time incident response playbook following NIST framework for active attack events, including timeline, forensics, and recommended actions.
-                    </div>
-
-                    <div class="prompt-box">
-                        <span class="prompt-label">USER PROMPT</span>
-Create an attack event response playbook for the exploited attack from IP 10.1.3.116. Show the incident timeline, provide a NIST framework-based response workflow (Detection, Containment, Eradication, Recovery, Post-Incident), display attack forensics with payload samples, include interactive action checklists with priority tiers (immediate, short-term, long-term), show stakeholder communication matrix, and preserve evidence collection logs.
-                    </div>
-
-                    <div class="output-info">
-                        <h4>📤 Output Generated:</h4>
-                        <ul>
-                            <li>Critical incident banner with pulsing animation for active threat</li>
-                            <li>5-phase NIST IR workflow with progress tracking (40% complete)</li>
-                            <li>Attack timeline showing 41-second attack window (21:31:07 to 21:31:48)</li>
-                            <li>Forensic evidence: HTTP logs, system commands, file access, SQL queries, network capture</li>
-                            <li>Interactive checklist with 21 action items across 3 priority tiers</li>
-                            <li>Stakeholder notification matrix with 6 personnel and contact info</li>
-                            <li>Attack payload samples (Command Injection, SQL Injection, Path Traversal)</li>
-                            <li>Evidence chain of custody tracking</li>
-                            <li>Related attacks table showing additional probed attempts</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Developer Security Training Module Report -->
-        <div class="report-section">
-            <div class="report-header">
-                <h2>🎓 Developer Security Training</h2>
-                <p>Generated: January 17, 2026 | File: developer_training.html</p>
-            </div>
-
-            <div class="prompt-card" style="border-radius: 0 0 10px 10px;">
-                <div class="prompt-header">
-                    <h3>
-                        <span class="prompt-number">1</span>
-                        Interactive Learning Module
-                    </h3>
-                </div>
-                <div class="prompt-content">
-                    <div class="prompt-meta">
-                        <span class="meta-badge">📚 MCP Tool: search_vulnerabilities</span>
-                        <span class="meta-badge">🎯 Focus: Top 3 Vulnerability Types</span>
-                        <span class="meta-badge">✍️ Features: Quizzes, Exercises, Badges</span>
-                    </div>
-
-                    <div class="prompt-description">
-                        <strong>Purpose:</strong> Create an interactive training module for developers covering the top 3 vulnerability types found in the actual codebase with quizzes, code challenges, and gamification.
-                    </div>
-
-                    <div class="prompt-box">
-                        <span class="prompt-label">USER PROMPT</span>
-Create a developer security training module based on the top 3 vulnerability types in the Cargo Cats codebase (SQL Injection, Command Injection, XSS). For each vulnerability type, include: what it is, real examples from the codebase with file and line numbers, vulnerable code snippets, attack scenarios, secure coding patterns, interactive quiz questions with instant feedback, and hands-on exercises. Add gamification with progress tracking, achievement badges, and quiz scores.
-                    </div>
-
-                    <div class="output-info">
-                        <h4>📤 Output Generated:</h4>
-                        <ul>
-                            <li>Training dashboard with security posture overview and progress tracking</li>
-                            <li>3 expandable interactive lessons (SQL Injection, Command Injection, XSS)</li>
-                            <li>Real vulnerability examples from actual codebase (PaymentController.java:55, app.py:284)</li>
-                            <li>7 interactive quiz questions with instant correct/incorrect feedback</li>
-                            <li>Attack scenario demonstrations (data breach, reverse shells, session hijacking)</li>
-                            <li>Secure coding patterns (PreparedStatement, whitelist validation, output encoding)</li>
-                            <li>Hands-on exercises with checklists</li>
-                            <li>Gamification: 3 unlockable badges, progress bar, time tracking</li>
-                            <li>Resources section with OWASP links and security documentation</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <section class="intro">
-            <h2>💡 Key Insights</h2>
-            <p>
-                <strong>Prompt Engineering:</strong> The prompts demonstrate natural language interaction with the MCP server.
-                No complex API calls or SQL queries were needed - just conversational requests.
-            </p>
-            <p style="margin-top: 15px;">
-                <strong>MCP Integration:</strong> The Contrast MCP Server seamlessly provides security data through standardized
-                tool interfaces, enabling AI to generate comprehensive security reports and visualizations.
-            </p>
-            <p style="margin-top: 15px;">
-                <strong>Multi-Step Workflows:</strong> Complex outputs like the attack map required multiple prompts - first
-                to retrieve data, then to create the visualization. This modular approach allows for flexible, iterative development.
-            </p>
-        </section>
-
-        <footer>
-            <p>Generated using Contrast Security MCP Server | <a href="https://www.contrastsecurity.com" target="_blank">contrastsecurity.com</a></p>
-            <p style="margin-top: 10px; font-size: 0.9em;"><a href="index.html">← Back to Reports</a></p>
-        </footer>
-    </div>
-
-    <script>
-        // Add copy functionality for prompt boxes (future enhancement)
-        document.querySelectorAll('.prompt-box').forEach(box => {
-            box.style.cursor = 'pointer';
-            box.title = 'Click to select text';
-        });
-    </script>
+  <footer class="site">
+    <p>Generated with the <strong>Contrast Security MCP Server</strong> · <a href="index.html">← Back to hub</a></p>
+    <p style="margin-top:8px">Last updated June 23, 2026 · Built with Claude Opus 4.8</p>
+  </footer>
+</div>
+<script src="assets/theme.js"></script>
 </body>
 </html>
