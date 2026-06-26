@@ -9,10 +9,27 @@
 <link rel="stylesheet" href="assets/theme.css">
 <style>
   [data-accordion] .acc-body { max-height: 0; overflow: hidden; transition: max-height 0.45s var(--ease); }
-  [data-accordion].open .acc-body { max-height: 600px; }
+  [data-accordion].open .acc-body { max-height: 2400px; }
   [data-accordion].open .acc-icon { transform: rotate(90deg); }
   .acc-icon { transition: transform 0.3s var(--ease); color: var(--brand); }
   .lesson-num { display:inline-flex;width:30px;height:30px;border-radius:9px;align-items:center;justify-content:center;background:var(--brand-soft);color:var(--brand);font-weight:700;font-size:0.9rem;margin-right:10px }
+  .code-label { display:inline-block; font-size:0.78rem; letter-spacing:0.02em; text-transform:uppercase; padding:5px 9px; border-radius:8px; margin-bottom:8px; }
+  .code-label.bad { background:rgba(255,77,109,0.2); color:#ff8fa3; }
+  .code-label.good { background:rgba(52,226,168,0.18); color:#8ef2cf; }
+  .code-block { margin-top:10px; border:1px solid rgba(255,255,255,0.08); border-radius:12px; overflow:hidden; }
+  .code-block pre { margin:0; padding:12px 14px; font-size:0.8rem; line-height:1.6; background:rgba(9,12,25,0.9); color:#d6ddff; overflow:auto; }
+  .quiz { margin-top:14px; border-top:1px solid rgba(255,255,255,0.08); padding-top:12px; }
+  .quiz p { margin:0 0 8px 0; color:var(--text); font-weight:600; font-size:0.9rem; }
+  .quiz-options { display:grid; gap:8px; }
+  .quiz-options button { text-align:left; border:1px solid rgba(255,255,255,0.16); background:rgba(255,255,255,0.04); color:var(--text-dim); border-radius:9px; padding:8px 10px; cursor:pointer; font-size:0.85rem; }
+  .quiz-options button:hover { border-color:var(--brand); color:var(--text); }
+  .quiz-feedback { display:none; margin-top:8px; font-size:0.84rem; border-radius:8px; padding:8px 10px; }
+  .quiz-feedback.ok { display:block; background:rgba(52,226,168,0.15); color:#9ff3d3; border:1px solid rgba(52,226,168,0.3); }
+  .quiz-feedback.no { display:block; background:rgba(255,77,109,0.14); color:#ffb4c1; border:1px solid rgba(255,77,109,0.3); }
+  .lesson-actions { margin-top:12px; display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+  .lesson-actions button { border:1px solid rgba(34,211,238,0.4); background:rgba(34,211,238,0.16); color:#9befff; border-radius:999px; padding:7px 12px; cursor:pointer; font-size:0.82rem; }
+  .lesson-actions button:disabled { opacity:0.5; cursor:not-allowed; }
+  .lesson-state { font-size:0.82rem; color:var(--text-faint); }
 </style>
 </head>
 <body>
@@ -33,15 +50,17 @@
     <section class="hero reveal">
       <span class="eyebrow">🎓 Secure Coding Academy</span>
       <h1>Developer Security Training</h1>
-      <p class="sub">Bite-sized lessons built from CargoCats' real findings — learn to spot and fix the exact vulnerabilities living in your codebase today.</p>
-      <div class="meta"><span class="chip">3 lessons</span><span class="chip ok">Hands-on</span><span class="chip">CWE-mapped</span></div>
+      <p class="sub">Main-branch deep-dive content restored: three hands-on lessons from real Cargo Cats findings, each with attack scenarios, secure coding patterns, quiz prompts, and remediation exercises.</p>
+      <div class="meta"><span class="chip">3 deep lessons</span><span class="chip crit">Top 3 vulns</span><span class="chip">CWE-mapped</span></div>
     </section>
 
     <section class="section">
-      <h2><span class="accent"></span> Your Progress</h2>
-      <div class="card reveal">
-        <div style="display:flex;justify-content:space-between;margin-bottom:10px"><span style="color:var(--text-dim)">1 of 3 lessons complete</span><strong>33%</strong></div>
-        <div class="meter"><span data-fill="33"></span></div>
+      <h2><span class="accent"></span> Training Snapshot</h2>
+      <div class="grid cols-4" data-stagger>
+        <div class="card kpi brand"><div class="label">Lessons</div><div class="value">3</div><div class="delta">SQLi, command injection, XSS</div><span class="spark">📘</span></div>
+        <div class="card kpi crit"><div class="label">Critical Focus</div><div class="value">1</div><div class="delta">SQL Injection module</div><span class="spark">🔴</span></div>
+        <div class="card kpi high"><div class="label">High Focus</div><div class="value">1</div><div class="delta">Command injection module</div><span class="spark">🛡️</span></div>
+        <div class="card kpi med"><div class="label">Completion</div><div class="value" id="completionPct">0%</div><div class="delta" id="completionText">0 of 3 lessons completed</div><span class="spark">🧠</span></div>
       </div>
     </section>
 
@@ -50,26 +69,80 @@
       <div class="grid" data-stagger style="gap:14px">
         <div class="card interactive" data-accordion>
           <div data-toggle style="display:flex;justify-content:space-between;align-items:center;cursor:pointer">
-            <div style="display:flex;align-items:center"><span class="lesson-num">1</span><div><h3 style="font-size:1.05rem">SQL Injection</h3><span style="color:var(--text-faint);font-size:0.82rem">CWE-89 · PaymentController.java:55</span></div></div>
+            <div style="display:flex;align-items:center"><span class="lesson-num">1</span><div><h3 style="font-size:1.05rem">SQL Injection</h3><span style="color:var(--text-faint);font-size:0.82rem">CWE-89 · PaymentController.java</span></div></div>
             <span class="acc-icon">▶</span>
           </div>
           <div class="acc-body"><div style="padding-top:14px;color:var(--text-dim);line-height:1.8">
-            <p>Untrusted input is concatenated into a SQL query, letting attackers alter its structure. CargoCats' <code>dataservice</code> builds a payment query by string concatenation.</p>
-            <p style="margin-top:10px"><strong style="color:var(--text)">Quiz:</strong> What is the single best defense?</p>
-            <p style="margin-top:6px">✅ Parameterized queries / prepared statements<br>❌ Escaping quotes manually<br>❌ Hiding SQL errors</p>
-            <span class="badge ok" style="margin-top:12px">Status: Completed</span>
+            <p><strong style="color:var(--text)">What it is:</strong> SQL injection allows attacker-controlled input to alter query structure, enabling unauthorized reads, writes, or destructive actions.</p>
+            <p style="margin-top:10px"><strong style="color:var(--text)">Cargo Cats case:</strong> untrusted input is concatenated into a payment query in <code>PaymentController</code>, creating a critical injection path.</p>
+            <p style="margin-top:10px"><strong style="color:var(--text)">Attack scenarios:</strong> data breach via <code>OR 1=1</code>, and data destruction via stacked statements like <code>DROP TABLE</code>.</p>
+            <p style="margin-top:10px"><strong style="color:var(--text)">Secure pattern:</strong> prepared statements with bound parameters, strict allow-list validation, and least-privilege DB accounts.</p>
+            <div class="code-block">
+              <span class="code-label bad">Insecure Example</span>
+              <pre>// PaymentController.java (vulnerable)
+String sql = "SELECT * FROM payments WHERE account_id = '" + accountId + "'";
+return jdbcTemplate.queryForList(sql);</pre>
+            </div>
+            <div class="code-block">
+              <span class="code-label good">Secure Example</span>
+              <pre>// PaymentController.java (fixed)
+String sql = "SELECT * FROM payments WHERE account_id = ?";
+return jdbcTemplate.queryForList(sql, accountId);</pre>
+            </div>
+            <div class="quiz">
+              <p>Test: Which is the best primary defense for SQL injection?</p>
+              <div class="quiz-options">
+                <button data-quiz="q1" data-correct="1">Prepared statements with bound parameters</button>
+                <button data-quiz="q1">Escaping single quotes manually</button>
+                <button data-quiz="q1">Returning generic database errors</button>
+              </div>
+              <div id="q1-feedback" class="quiz-feedback"></div>
+            </div>
+            <div class="lesson-actions">
+              <button id="lesson-1-btn" data-complete="1">Mark SQL Injection lesson complete</button>
+              <span id="lesson-1-state" class="lesson-state">Not completed</span>
+            </div>
+            <span class="badge crit" style="margin-top:12px">Priority: Critical</span>
           </div></div>
         </div>
         <div class="card interactive" data-accordion>
           <div data-toggle style="display:flex;justify-content:space-between;align-items:center;cursor:pointer">
-            <div style="display:flex;align-items:center"><span class="lesson-num">2</span><div><h3 style="font-size:1.05rem">Weak Cryptography</h3><span style="color:var(--text-faint);font-size:0.82rem">CWE-327 · Digester.java</span></div></div>
+            <div style="display:flex;align-items:center"><span class="lesson-num">2</span><div><h3 style="font-size:1.05rem">Command Injection</h3><span style="color:var(--text-faint);font-size:0.82rem">CWE-78 · webhookservice command execution flow</span></div></div>
             <span class="acc-icon">▶</span>
           </div>
           <div class="acc-body"><div style="padding-top:14px;color:var(--text-dim);line-height:1.8">
-            <p>MD5 is cryptographically broken and unfit for passwords or integrity. Two CargoCats services still call it.</p>
-            <p style="margin-top:10px"><strong style="color:var(--text)">Quiz:</strong> Best choice for password storage?</p>
-            <p style="margin-top:6px">✅ bcrypt / Argon2 (adaptive, salted)<br>❌ MD5<br>❌ Plain SHA-256</p>
-            <span class="badge med" style="margin-top:12px">Status: In progress</span>
+            <p><strong style="color:var(--text)">What it is:</strong> command injection occurs when user input is passed to a shell command without strict separation of arguments.</p>
+            <p style="margin-top:10px"><strong style="color:var(--text)">Cargo Cats case:</strong> attack attempts included reverse-shell payloads, exfiltration commands, and system-impacting shell tokens.</p>
+            <p style="margin-top:10px"><strong style="color:var(--text)">Attack scenarios:</strong> remote shell access, reading sensitive files, and service disruption.</p>
+            <p style="margin-top:10px"><strong style="color:var(--text)">Secure pattern:</strong> avoid shell invocation; use safe APIs, strict argument allow-lists, and execution context hardening.</p>
+            <div class="code-block">
+              <span class="code-label bad">Insecure Example</span>
+              <pre>// WebhookProcessor.java (vulnerable)
+String cmd = "curl -X POST " + callbackUrl;
+Runtime.getRuntime().exec(cmd);</pre>
+            </div>
+            <div class="code-block">
+              <span class="code-label good">Secure Example</span>
+              <pre>// WebhookProcessor.java (fixed)
+URI uri = URI.create(callbackUrl);
+if (!ALLOWED_HOSTS.contains(uri.getHost())) throw new SecurityException();
+HttpRequest req = HttpRequest.newBuilder(uri).POST(HttpRequest.BodyPublishers.noBody()).build();
+client.send(req, HttpResponse.BodyHandlers.discarding());</pre>
+            </div>
+            <div class="quiz">
+              <p>Test: Which implementation is safest for user-influenced commands?</p>
+              <div class="quiz-options">
+                <button data-quiz="q2" data-correct="1">Avoid shell execution and use native API clients</button>
+                <button data-quiz="q2">Filter dangerous characters then call shell</button>
+                <button data-quiz="q2">Run shell as root to simplify permissions</button>
+              </div>
+              <div id="q2-feedback" class="quiz-feedback"></div>
+            </div>
+            <div class="lesson-actions">
+              <button id="lesson-2-btn" data-complete="2">Mark Command Injection lesson complete</button>
+              <span id="lesson-2-state" class="lesson-state">Not completed</span>
+            </div>
+            <span class="badge high" style="margin-top:12px">Priority: High</span>
           </div></div>
         </div>
         <div class="card interactive" data-accordion>
@@ -78,20 +151,59 @@
             <span class="acc-icon">▶</span>
           </div>
           <div class="acc-body"><div style="padding-top:14px;color:var(--text-dim);line-height:1.8">
-            <p>The <code>trackingId</code> parameter is reflected without encoding, letting attackers inject script into a victim's browser session.</p>
-            <p style="margin-top:10px"><strong style="color:var(--text)">Quiz:</strong> Primary defense for reflected XSS?</p>
-            <p style="margin-top:6px">✅ Context-aware output encoding<br>❌ Client-side validation only<br>❌ Blocking the &lt;script&gt; word</p>
-            <span class="badge low" style="margin-top:12px">Status: Not started</span>
+            <p><strong style="color:var(--text)">What it is:</strong> reflected XSS injects attacker script through request input and reflects it in the response.</p>
+            <p style="margin-top:10px"><strong style="color:var(--text)">Cargo Cats case:</strong> the <code>trackingId</code> parameter is rendered without output encoding.</p>
+            <p style="margin-top:10px"><strong style="color:var(--text)">Attack scenarios:</strong> session hijacking, phishing overlays, and keylogging payloads in user browsers.</p>
+            <p style="margin-top:10px"><strong style="color:var(--text)">Secure pattern:</strong> context-aware output encoding, template auto-escaping, CSP, and HTTPOnly cookies.</p>
+            <div class="code-block">
+              <span class="code-label bad">Insecure Example</span>
+              <pre>// ShipmentController.java (vulnerable)
+String html = "&lt;h2&gt;Tracking: " + trackingId + "&lt;/h2&gt;";
+return ResponseEntity.ok(html);</pre>
+            </div>
+            <div class="code-block">
+              <span class="code-label good">Secure Example</span>
+              <pre>// ShipmentController.java (fixed)
+String safeTrackingId = HtmlUtils.htmlEscape(trackingId);
+String html = "&lt;h2&gt;Tracking: " + safeTrackingId + "&lt;/h2&gt;";
+return ResponseEntity.ok(html);</pre>
+            </div>
+            <div class="quiz">
+              <p>Test: What is the strongest primary defense against reflected XSS?</p>
+              <div class="quiz-options">
+                <button data-quiz="q3" data-correct="1">Context-aware output encoding</button>
+                <button data-quiz="q3">Client-side validation only</button>
+                <button data-quiz="q3">Blocking the word script in input</button>
+              </div>
+              <div id="q3-feedback" class="quiz-feedback"></div>
+            </div>
+            <div class="lesson-actions">
+              <button id="lesson-3-btn" data-complete="3">Mark XSS lesson complete</button>
+              <span id="lesson-3-state" class="lesson-state">Not completed</span>
+            </div>
+            <span class="badge med" style="margin-top:12px">Priority: Medium</span>
           </div></div>
         </div>
       </div>
     </section>
 
     <section class="section">
-      <h2><span class="accent"></span> Resources &amp; Certifications</h2>
-      <div class="grid cols-2" data-stagger>
-        <div class="card interactive"><h3 style="font-size:1rem;margin-bottom:8px">📚 Reference</h3><ul style="margin:0 0 0 18px;color:var(--text-dim);line-height:1.9"><li>OWASP Top 10 (2021)</li><li>CWE/SANS Top 25</li><li>OWASP Cheat Sheet Series</li></ul></div>
-        <div class="card interactive"><h3 style="font-size:1rem;margin-bottom:8px">🏅 Certifications</h3><ul style="margin:0 0 0 18px;color:var(--text-dim);line-height:1.9"><li>OWASP Certified Secure Developer (OCSD)</li><li>Certified Ethical Hacker (CEH)</li><li>GIAC Secure Software (GSSP)</li></ul></div>
+      <h2><span class="accent"></span> Knowledge Scoreboard</h2>
+      <div class="card reveal">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+          <div style="color:var(--text-dim)">Quiz score: <strong id="quizScore" style="color:var(--text)">0/3</strong></div>
+          <div style="color:var(--text-dim)">Completed lessons: <strong id="lessonScore" style="color:var(--text)">0/3</strong></div>
+        </div>
+        <div class="meter" style="margin-top:10px"><span id="trainingProgress" data-fill="0"></span></div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2><span class="accent"></span> Resources &amp; Practice</h2>
+      <div class="grid cols-3" data-stagger>
+        <div class="card interactive"><h3 style="font-size:1rem;margin-bottom:8px">📚 Standards</h3><ul style="margin:0 0 0 18px;color:var(--text-dim);line-height:1.9"><li>OWASP Top 10</li><li>CWE/SANS Top 25</li><li>OWASP Cheat Sheet Series</li></ul></div>
+        <div class="card interactive"><h3 style="font-size:1rem;margin-bottom:8px">🧪 Hands-On</h3><ul style="margin:0 0 0 18px;color:var(--text-dim);line-height:1.9"><li>Refactor vulnerable snippets to secure patterns</li><li>Test with SQLi and XSS payloads safely in dev</li><li>Validate defenses with automated checks</li></ul></div>
+        <div class="card interactive"><h3 style="font-size:1rem;margin-bottom:8px">🛠️ Controls</h3><ul style="margin:0 0 0 18px;color:var(--text-dim);line-height:1.9"><li>Prepared statements everywhere</li><li>No shell interpolation from user input</li><li>Output encoding + CSP + cookie hardening</li></ul></div>
       </div>
     </section>
   </main>
@@ -102,5 +214,56 @@
   </footer>
 </div>
 <script src="assets/theme.js"></script>
+<script>
+const completedLessons = new Set();
+const passedQuizzes = new Set();
+
+function updateProgress() {
+  const lessonCount = completedLessons.size;
+  const quizCount = passedQuizzes.size;
+  const pct = Math.round(((lessonCount + quizCount) / 6) * 100);
+
+  document.getElementById('completionPct').textContent = `${Math.round((lessonCount / 3) * 100)}%`;
+  document.getElementById('completionText').textContent = `${lessonCount} of 3 lessons completed`;
+  document.getElementById('quizScore').textContent = `${quizCount}/3`;
+  document.getElementById('lessonScore').textContent = `${lessonCount}/3`;
+
+  const progress = document.getElementById('trainingProgress');
+  progress.style.width = `${pct}%`;
+  progress.setAttribute('data-fill', String(pct));
+}
+
+document.querySelectorAll('[data-quiz]').forEach((btn) => {
+  btn.addEventListener('click', () => {
+    const quizId = btn.getAttribute('data-quiz');
+    const feedback = document.getElementById(`${quizId}-feedback`);
+    const isCorrect = btn.hasAttribute('data-correct');
+
+    if (isCorrect) {
+      feedback.className = 'quiz-feedback ok';
+      feedback.textContent = 'Correct. Nice work.';
+      passedQuizzes.add(quizId);
+    } else {
+      feedback.className = 'quiz-feedback no';
+      feedback.textContent = 'Not quite. Try again and select the strongest secure pattern.';
+    }
+
+    updateProgress();
+  });
+});
+
+document.querySelectorAll('[data-complete]').forEach((btn) => {
+  btn.addEventListener('click', () => {
+    const lessonNum = btn.getAttribute('data-complete');
+    completedLessons.add(lessonNum);
+    btn.disabled = true;
+    const state = document.getElementById(`lesson-${lessonNum}-state`);
+    if (state) state.textContent = 'Completed';
+    updateProgress();
+  });
+});
+
+updateProgress();
+</script>
 </body>
 </html>

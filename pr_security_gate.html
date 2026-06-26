@@ -26,37 +26,92 @@
     <section class="hero reveal">
       <span class="eyebrow">✅ Shift Left · CI/CD Integration</span>
       <h1>Pull Request Security Gate</h1>
-      <p class="sub">How Contrast policy enforcement blocks risky merges before they ship — with sample pull requests and a ready-to-use GitHub Actions workflow.</p>
-      <div class="meta"><span class="chip crit">Block on critical</span><span class="chip med">Warn on medium</span><span class="chip ok">Pass when clean</span></div>
+      <p class="sub">Main-branch PR gate content restored: blocked/approved examples, code-diff findings, bot comments, status checks, and policy-driven merge outcomes.</p>
+      <div class="meta"><span class="chip crit">Critical blocks merge</span><span class="chip med">Medium requires review</span><span class="chip ok">Clean PR auto-green</span></div>
     </section>
 
     <section class="section">
       <h2><span class="accent"></span> Gate Policy</h2>
       <div class="grid cols-3" data-stagger>
-        <div class="card interactive"><span class="badge crit">Block</span><h3 style="margin:10px 0;font-size:1rem">Hard fail</h3><p style="color:var(--text-dim);font-size:0.9rem">≥ 1 Critical or ≥ 3 High findings introduced by the PR.</p></div>
-        <div class="card interactive"><span class="badge med">Warn</span><h3 style="margin:10px 0;font-size:1rem">Review required</h3><p style="color:var(--text-dim);font-size:0.9rem">Any new Medium finding — merge allowed with reviewer sign-off.</p></div>
-        <div class="card interactive"><span class="badge ok">Pass</span><h3 style="margin:10px 0;font-size:1rem">Green</h3><p style="color:var(--text-dim);font-size:0.9rem">No new findings above policy threshold. Auto-eligible to merge.</p></div>
+        <div class="card interactive"><span class="badge crit">Block</span><h3 style="margin:10px 0;font-size:1rem">Critical / High Gate</h3><p style="color:var(--text-dim);font-size:0.9rem">Any new Critical finding blocks immediately; High follows strict team threshold.</p></div>
+        <div class="card interactive"><span class="badge med">Warn</span><h3 style="margin:10px 0;font-size:1rem">Medium Review</h3><p style="color:var(--text-dim);font-size:0.9rem">Medium findings create warnings and require explicit reviewer acknowledgment before merge.</p></div>
+        <div class="card interactive"><span class="badge ok">Pass</span><h3 style="margin:10px 0;font-size:1rem">Policy Compliant</h3><p style="color:var(--text-dim);font-size:0.9rem">No policy-breaking findings; CI checks and security gate mark PR as merge-ready.</p></div>
       </div>
     </section>
 
     <section class="section">
-      <h2><span class="accent"></span> Sample Pull Requests</h2>
-      <div class="grid cols-3" data-stagger>
+      <h2><span class="accent"></span> Recent Pull Requests</h2>
+      <div class="grid cols-4" data-stagger>
         <div class="card interactive">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><span class="badge ok">Approved</span><span style="color:var(--text-faint);font-size:0.82rem">#1247</span></div>
-          <h3 style="font-size:1rem;margin-bottom:8px">Refactor payment API</h3>
-          <p style="color:var(--text-dim);font-size:0.9rem">0 new findings · build ✅ · tests ✅ · coverage 84%.</p>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><span class="badge crit">Blocked</span><span style="color:var(--text-faint);font-size:0.82rem">#423</span></div>
+          <h3 style="font-size:1rem;margin-bottom:8px">Payment API changes</h3>
+          <p style="color:var(--text-dim);font-size:0.9rem">1 Critical SQL injection, 2 Medium findings. Security gate blocked merge.</p>
         </div>
         <div class="card interactive">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><span class="badge med">Warning</span><span style="color:var(--text-faint);font-size:0.82rem">#1251</span></div>
-          <h3 style="font-size:1rem;margin-bottom:8px">User auth changes</h3>
-          <p style="color:var(--text-dim);font-size:0.9rem">2 Medium (XSS, weak hash) · coverage 72% · reviewer sign-off needed.</p>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><span class="badge crit">Blocked</span><span style="color:var(--text-faint);font-size:0.82rem">#422</span></div>
+          <h3 style="font-size:1rem;margin-bottom:8px">Checkout workflow update</h3>
+          <p style="color:var(--text-dim);font-size:0.9rem">Critical deserialization issue introduced; merge prevented by policy.</p>
         </div>
         <div class="card interactive">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><span class="badge crit">Blocked</span><span style="color:var(--text-faint);font-size:0.82rem">#1253</span></div>
-          <h3 style="font-size:1rem;margin-bottom:8px">Dependency update</h3>
-          <p style="color:var(--text-dim);font-size:0.9rem">1 Critical (SQL injection) · gate failed · merge blocked.</p>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><span class="badge ok">Approved</span><span style="color:var(--text-faint);font-size:0.82rem">#421</span></div>
+          <h3 style="font-size:1rem;margin-bottom:8px">Refactor billing model</h3>
+          <p style="color:var(--text-dim);font-size:0.9rem">No critical/high/medium deltas; gate and CI all passed.</p>
         </div>
+        <div class="card interactive">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><span class="badge med">Warning</span><span style="color:var(--text-faint);font-size:0.82rem">#420</span></div>
+          <h3 style="font-size:1rem;margin-bottom:8px">Logging improvements</h3>
+          <p style="color:var(--text-dim);font-size:0.9rem">1 Medium log-injection warning; reviewer sign-off required.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2><span class="accent"></span> Code-Diff Security Findings (PR #423)</h2>
+      <div class="card reveal" style="padding:0;overflow:hidden">
+        <table class="data">
+          <thead><tr><th>Severity</th><th>Finding</th><th>Location</th><th>Action</th></tr></thead>
+          <tbody>
+            <tr><td><span class="badge crit">Critical</span></td><td>SQL Injection</td><td>PaymentController.java:94</td><td>Use parameterized query and input constraints</td></tr>
+            <tr><td><span class="badge med">Medium</span></td><td>Log Injection</td><td>TransactionLogger.java:47</td><td>Sanitize/encode user-controlled log fields</td></tr>
+            <tr><td><span class="badge med">Medium</span></td><td>Weak Hash Use</td><td>HashUtil.java:23</td><td>Replace legacy hash with modern algorithm</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2><span class="accent"></span> CI/CD Status Checks</h2>
+      <div class="grid cols-4" data-stagger>
+        <div class="card kpi crit"><div class="label">Security Gate</div><div class="value" style="font-size:1.35rem">Blocked</div><div class="delta">1 Critical found</div><span class="spark">🚫</span></div>
+        <div class="card kpi ok"><div class="label">Unit Tests</div><div class="value" style="font-size:1.35rem">42/42</div><div class="delta">All passing</div><span class="spark">🧪</span></div>
+        <div class="card kpi ok"><div class="label">Build</div><div class="value" style="font-size:1.35rem">Pass</div><div class="delta">No compile errors</div><span class="spark">🏗️</span></div>
+        <div class="card kpi ok"><div class="label">Coverage</div><div class="value" style="font-size:1.35rem">87%</div><div class="delta">Target 80%</div><span class="spark">📊</span></div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2><span class="accent"></span> Activity Timeline</h2>
+      <div class="card reveal">
+        <ul style="margin:0 0 0 18px;color:var(--text-dim);line-height:1.9">
+          <li><strong style="color:var(--text)">2h ago</strong> Contrast gate comment posted: merge blocked due to critical finding</li>
+          <li><strong style="color:var(--text)">2h ago</strong> Security scan complete: 1 Critical, 2 Medium, 3 Low</li>
+          <li><strong style="color:var(--text)">2h ago</strong> Developer pushed updates to feature branch</li>
+          <li><strong style="color:var(--text)">4h ago</strong> CI tests completed successfully</li>
+          <li><strong style="color:var(--text)">5h ago</strong> Pull request opened</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2><span class="accent"></span> Automated PR Comment (Contrast Bot)</h2>
+      <div class="card reveal">
+        <p style="color:var(--text);font-weight:700;margin-bottom:8px">🚫 Security Gate: BLOCKED</p>
+        <p style="color:var(--text-dim);font-size:0.92rem">Contrast detected policy-breaking vulnerabilities in this pull request. Merge remains blocked until critical issues are remediated and scan reruns cleanly.</p>
+        <ul style="margin:12px 0 0 18px;color:var(--text-dim);line-height:1.8">
+          <li>Fix SQL Injection in <strong style="color:var(--text)">PaymentController.java</strong></li>
+          <li>Address Medium findings and document residual risk</li>
+          <li>Re-run gate and require reviewer approval before merge</li>
+        </ul>
       </div>
     </section>
 
@@ -79,16 +134,6 @@
             --app=cargocats-dataservice
       - <span class="c-key">name:</span> Enforce policy
         run: contrast-cli gate --policy=.contrast/policy.yml</div>
-      </div>
-    </section>
-
-    <section class="section">
-      <h2><span class="accent"></span> Per-PR Checks</h2>
-      <div class="grid cols-4" data-stagger>
-        <div class="card kpi ok"><div class="label">Build</div><div class="value" style="font-size:1.6rem">Pass</div><span class="spark">🏗️</span></div>
-        <div class="card kpi ok"><div class="label">Unit Tests</div><div class="value" style="font-size:1.6rem">Pass</div><span class="spark">🧪</span></div>
-        <div class="card kpi crit"><div class="label">Security Gate</div><div class="value" style="font-size:1.6rem">Block</div><span class="spark">🚦</span></div>
-        <div class="card kpi med"><div class="label">Coverage</div><div class="value" data-count="72" data-suffix="%">0</div><span class="spark">📊</span></div>
       </div>
     </section>
   </main>

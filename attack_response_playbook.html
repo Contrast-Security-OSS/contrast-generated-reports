@@ -34,10 +34,34 @@
     <section class="hero reveal">
       <span class="eyebrow">🚨 Incident Response · NIST SP 800-61</span>
       <h1>Attack Response Playbook</h1>
-      <p class="sub">A ready-to-activate incident-response framework for CargoCats. Currently a template — no active incidents — with expandable phase guidance, a live checklist, and an escalation matrix.</p>
+      <p class="sub">Main-branch incident content restored: active exploited-attack scenario for cargo-cats-webhookservice, with timeline, containment workflow, escalation routing, and evidence-preservation guidance.</p>
     </section>
 
-    <div class="banner ok reveal"><span class="ico">✅</span><div><h2>No Active Incidents</h2><p>ADR reports zero active attacks. This playbook stands ready for activation; the phases below define the response should that change.</p></div></div>
+    <div class="banner crit reveal"><span class="ico">⚠️</span><div><h2>Active Security Incident (Simulated Playbook State)</h2><p>Incident ID <strong>c7049a6c-8ae4-4f11-bdf8-c58a154c3bba</strong> indicates a successful exploitation against <strong>cargo-cats-webhookservice</strong>. Response is in active containment mode.</p></div></div>
+
+    <section class="section">
+      <h2><span class="accent"></span> Incident Overview</h2>
+      <div class="grid cols-4" data-stagger>
+        <div class="card kpi crit"><div class="label">Severity</div><div class="value" style="font-size:1.25rem">CRITICAL</div><div class="delta">Exploited attack</div><span class="spark">🚨</span></div>
+        <div class="card kpi high"><div class="label">Target Service</div><div class="value" style="font-size:1.1rem">webhookservice</div><div class="delta">Cargo Cats</div><span class="spark">🧩</span></div>
+        <div class="card kpi med"><div class="label">Source IP</div><div class="value" style="font-size:1.1rem">10.1.3.116</div><div class="delta">Investigate origin</div><span class="spark">🌐</span></div>
+        <div class="card kpi brand"><div class="label">Observed Probes</div><div class="value">33</div><div class="delta">Multi-vector</div><span class="spark">📈</span></div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2><span class="accent"></span> Attack Timeline</h2>
+      <div class="card reveal">
+        <ul style="margin:0 0 0 18px;color:var(--text-dim);line-height:1.95">
+          <li><strong style="color:var(--text)">21:31:07 UTC</strong> Initial probe detected</li>
+          <li><strong style="color:var(--text)">21:31:12 UTC</strong> Command injection attempts observed</li>
+          <li><strong style="color:var(--text)">21:31:24 UTC</strong> SQL injection payloads detected</li>
+          <li><strong style="color:var(--text)">21:31:35 UTC</strong> Path traversal exploitation succeeded</li>
+          <li><strong style="color:var(--text)">21:31:48 UTC</strong> Active probing ceased</li>
+          <li><strong style="color:var(--text)">21:32:00 UTC</strong> Incident response activated</li>
+        </ul>
+      </div>
+    </section>
 
     <section class="section">
       <h2><span class="accent"></span> NIST Response Phases</h2>
@@ -47,60 +71,69 @@
             <h3 style="font-size:1.05rem">① Preparation</h3><span class="acc-icon">▶</span>
           </div>
           <div class="acc-body"><ul style="margin:14px 0 0 20px;color:var(--text-dim);line-height:1.9">
-            <li>Maintain the response plan and on-call rotation</li>
-            <li>Keep ADR, Assess, and logging tooling healthy</li>
-            <li>Run tabletop exercises quarterly</li></ul></div>
+            <li>Maintain on-call response ownership and escalation contacts</li>
+            <li>Keep ADR detections, Assess scans, and centralized logs healthy</li>
+            <li>Pre-stage forensic collection scripts and clean-room procedures</li></ul></div>
         </div>
         <div class="card interactive" data-accordion>
           <div data-toggle style="display:flex;justify-content:space-between;align-items:center;cursor:pointer">
             <h3 style="font-size:1.05rem">② Detection &amp; Analysis</h3><span class="acc-icon">▶</span>
           </div>
           <div class="acc-body"><ul style="margin:14px 0 0 20px;color:var(--text-dim);line-height:1.9">
-            <li>Triage ADR alerts; classify exploited vs. probed</li>
-            <li>Determine attack vector and affected applications</li>
-            <li>Establish an incident timeline from logs</li></ul></div>
+            <li>Classify event as exploited and production-impacting</li>
+            <li>Correlate vectors: command injection, SQL injection, path traversal</li>
+            <li>Build minute-level timeline from service and network telemetry</li></ul></div>
         </div>
         <div class="card interactive" data-accordion>
           <div data-toggle style="display:flex;justify-content:space-between;align-items:center;cursor:pointer">
             <h3 style="font-size:1.05rem">③ Containment</h3><span class="acc-icon">▶</span>
           </div>
           <div class="acc-body"><ul style="margin:14px 0 0 20px;color:var(--text-dim);line-height:1.9">
-            <li>Isolate affected services; preserve forensic evidence</li>
-            <li>Block source IPs at the perimeter / WAF</li>
-            <li>Apply ADR virtual patches where available</li></ul></div>
+            <li>Isolate affected service paths while preserving volatile evidence</li>
+            <li>Block malicious source IP ranges via perimeter controls</li>
+            <li>Apply temporary virtual patching and rule hardening</li></ul></div>
         </div>
         <div class="card interactive" data-accordion>
           <div data-toggle style="display:flex;justify-content:space-between;align-items:center;cursor:pointer">
             <h3 style="font-size:1.05rem">④ Eradication</h3><span class="acc-icon">▶</span>
           </div>
           <div class="acc-body"><ul style="margin:14px 0 0 20px;color:var(--text-dim);line-height:1.9">
-            <li>Remove malicious artifacts and persistence</li>
-            <li>Patch the root-cause vulnerability (see SmartFix)</li>
-            <li>Validate no re-entry paths remain</li></ul></div>
+            <li>Remove persistence artifacts and suspicious jobs/processes</li>
+            <li>Patch root causes and close vulnerable execution paths</li>
+            <li>Re-run attack replay and rule validation before reopening</li></ul></div>
         </div>
         <div class="card interactive" data-accordion>
           <div data-toggle style="display:flex;justify-content:space-between;align-items:center;cursor:pointer">
             <h3 style="font-size:1.05rem">⑤ Recovery</h3><span class="acc-icon">▶</span>
           </div>
           <div class="acc-body"><ul style="margin:14px 0 0 20px;color:var(--text-dim);line-height:1.9">
-            <li>Restore services in phases with integrity monitoring</li>
-            <li>Confirm clean state before reopening traffic</li>
-            <li>Document lessons learned and update this playbook</li></ul></div>
+            <li>Restore in phases with active anomaly and integrity checks</li>
+            <li>Confirm no secondary compromise before full traffic restore</li>
+            <li>Publish post-incident learnings into runbooks and training</li></ul></div>
         </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2><span class="accent"></span> Attack Vectors Triggered</h2>
+      <div class="grid cols-3" data-stagger>
+        <div class="card interactive"><span class="badge crit">Confirmed</span><h3 style="margin:10px 0;font-size:1rem">Path Traversal</h3><p style="color:var(--text-dim);font-size:0.9rem">Successful file-system traversal was observed and requires full forensic follow-up.</p></div>
+        <div class="card interactive"><span class="badge high">Attempted</span><h3 style="margin:10px 0;font-size:1rem">Command Injection</h3><p style="color:var(--text-dim);font-size:0.9rem">Multiple command payload variants indicate active shell-execution probing.</p></div>
+        <div class="card interactive"><span class="badge med">Attempted</span><h3 style="margin:10px 0;font-size:1rem">SQL Injection</h3><p style="color:var(--text-dim);font-size:0.9rem">Database-facing payloads were detected; review query boundaries and input paths.</p></div>
       </div>
     </section>
 
     <section class="section">
       <h2><span class="accent"></span> Response Checklist</h2>
       <div class="card reveal">
-        <label class="check"><input type="checkbox"> Activate incident-response team</label>
-        <label class="check"><input type="checkbox"> Triage &amp; classify the incident</label>
-        <label class="check"><input type="checkbox"> Preserve evidence &amp; logs</label>
-        <label class="check"><input type="checkbox"> Notify internal stakeholders</label>
-        <label class="check"><input type="checkbox"> Execute containment actions</label>
-        <label class="check"><input type="checkbox"> Assess external notification duties</label>
-        <label class="check"><input type="checkbox"> Eradicate root cause</label>
-        <label class="check" style="border-bottom:none"><input type="checkbox"> Conduct post-incident review</label>
+        <label class="check"><input type="checkbox"> Activate incident commander and security operations</label>
+        <label class="check"><input type="checkbox"> Isolate impacted service endpoints</label>
+        <label class="check"><input type="checkbox"> Capture memory, process, and access evidence</label>
+        <label class="check"><input type="checkbox"> Block hostile indicators (IP, user agents, signatures)</label>
+        <label class="check"><input type="checkbox"> Reset service credentials and rotate secrets</label>
+        <label class="check"><input type="checkbox"> Rebuild from clean artifacts where required</label>
+        <label class="check"><input type="checkbox"> Validate remediation with replay testing</label>
+        <label class="check" style="border-bottom:none"><input type="checkbox"> Run post-incident review and publish actions</label>
       </div>
     </section>
 
@@ -110,11 +143,21 @@
         <table class="data">
           <thead><tr><th>Role</th><th>Owner</th><th>Trigger</th></tr></thead>
           <tbody>
-            <tr><td>Security Lead</td><td>John Smith</td><td>Any confirmed exploit</td></tr>
-            <tr><td>CISO</td><td>Sarah Johnson</td><td>Critical or data-loss incident</td></tr>
-            <tr><td>Legal</td><td>Michael Chen</td><td>Regulated-data exposure</td></tr>
+            <tr><td>Incident Commander</td><td>Sarah Chen</td><td>Any confirmed exploit</td></tr>
+            <tr><td>Security Operations</td><td>Mike Rodriguez</td><td>Containment and forensic lead</td></tr>
+            <tr><td>Engineering Lead</td><td>Alex Kim</td><td>Service remediation ownership</td></tr>
+            <tr><td>VP Engineering</td><td>Jordan Taylor</td><td>Critical production impact</td></tr>
+            <tr><td>Legal / Compliance</td><td>Pat Morgan</td><td>Regulated-data or disclosure risk</td></tr>
           </tbody>
         </table>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2><span class="accent"></span> Evidence Collection</h2>
+      <div class="grid cols-2" data-stagger>
+        <div class="card interactive"><h3 style="font-size:1rem;margin-bottom:8px">Forensic Preservation</h3><ul style="margin:0 0 0 18px;color:var(--text-dim);line-height:1.9"><li>Application and reverse-proxy logs</li><li>Host process trees and command histories</li><li>Network flow records and blocked-event logs</li><li>Credential rotation and access events</li></ul></div>
+        <div class="card interactive"><h3 style="font-size:1rem;margin-bottom:8px">Chain of Custody</h3><ul style="margin:0 0 0 18px;color:var(--text-dim);line-height:1.9"><li>Timestamp each evidence artifact</li><li>Record collector identity and handoff trail</li><li>Store immutable copies with checksums</li><li>Track review and legal access requests</li></ul></div>
       </div>
     </section>
   </main>
