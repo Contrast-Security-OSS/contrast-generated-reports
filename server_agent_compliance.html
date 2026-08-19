@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Server Agent Compliance — Contrast Security</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/theme.css">
+<style>
+  table.data td a {
+    color: #ffffff;
+    font-weight: 600;
+    text-decoration-color: rgba(255, 255, 255, 0.55);
+  }
+
+  table.data td a:hover,
+  table.data td a:focus-visible {
+    color: #ffffff;
+    text-decoration-color: #ffffff;
+  }
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+</head>
+<body>
+<a href="#main" class="skip-link">Skip to content</a>
+<div class="wrap">
+  <header class="topbar">
+    <div class="brand"><span class="dot"></span> Contrast&nbsp;Security · Report Hub</div>
+    <nav aria-label="Primary">
+      <a href="index.html" class="home">← Overview</a>
+      <a href="vulnerability_dashboard.html">Vulnerabilities</a>
+      <a href="library_security.html">Libraries</a>
+      <a href="route_coverage.html">Routes</a>
+      <a href="prompts.html">Prompts</a>
+    </nav>
+  </header>
+
+  <main id="main">
+    <section class="hero reveal">
+      <span class="eyebrow">🖥️ Server Inventory · Agent Version Compliance</span>
+      <h1>Contrast Agent Compliance by Server</h1>
+      <p class="sub">Live fleet view across all servers in Contrast. Compliance is based on each server's reported <strong>agentOutOfDate</strong> status and the latest version metadata returned by Contrast.</p>
+      <div class="meta">
+        <span class="chip">8 servers</span>
+        <span class="chip crit">7 need upgrade</span>
+        <span class="chip ok">1 compliant</span>
+        <span class="chip">0 version checks unavailable</span>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2><span class="accent"></span> Fleet Snapshot</h2>
+      <div class="grid cols-4" data-stagger>
+        <div class="card kpi brand"><div class="label">Total Servers</div><div class="value" data-count="8">0</div><div class="delta">all online in QA</div><span class="spark">🧭</span></div>
+        <div class="card kpi crit"><div class="label">Needs Upgrade</div><div class="value" data-count="7">0</div><div class="delta">Java, Node.js, and Python agents</div><span class="spark">⬆️</span></div>
+        <div class="card kpi ok"><div class="label">Compliant</div><div class="value" data-count="1">0</div><div class="delta">.NET Core server</div><span class="spark">✅</span></div>
+        <div class="card kpi med"><div class="label">Unknown</div><div class="value" data-count="0">0</div><div class="delta">all latest versions known</div><span class="spark">❔</span></div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2><span class="accent"></span> Compliance Overview</h2>
+      <div class="grid cols-2">
+        <div class="card reveal">
+          <h3 style="font-size:1.05rem;margin-bottom:12px">Compliance Breakdown</h3>
+          <div style="height:300px"><canvas id="complianceChart" aria-label="Agent compliance by status" role="img"></canvas></div>
+        </div>
+        <div class="card reveal">
+          <h3 style="font-size:1.05rem;margin-bottom:12px">By Technology</h3>
+          <div style="height:300px"><canvas id="techChart" aria-label="Agent compliance by technology" role="img"></canvas></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2><span class="accent"></span> All Servers</h2>
+      <div class="card reveal" style="padding:0;overflow:hidden">
+        <table class="data">
+          <thead>
+            <tr>
+              <th>Server</th>
+              <th>Technology</th>
+              <th>Environment</th>
+              <th>Agent Version</th>
+              <th>Latest Known</th>
+              <th>Compliance</th>
+              <th>Release Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><a href="https://eval.contrastsecurity.com/Contrast/cs/index.html#/95a0c071-39b0-4495-b815-c119ec117f9f/admin/agents/d54f07e5-dce4-4ddb-8778-a0911906ecd8:3a6f9247-335e-4fe6-a5c2-3b6970c9332e" target="_blank" rel="noopener">5-20-2026-cargocats-frontgateservice-agent</a></td>
+              <td>Java</td>
+              <td>QA</td>
+              <td><code>6.33.1</code></td>
+              <td><code>6.34.0</code></td>
+              <td><span class="badge crit">Upgrade needed</span></td>
+              <td><a href="https://docs.contrastsecurity.com/en/java-agent-release-notes-and-archive.html" target="_blank" rel="noopener">Java notes ↗</a></td>
+            </tr>
+            <tr>
+              <td><a href="https://eval.contrastsecurity.com/Contrast/cs/index.html#/95a0c071-39b0-4495-b815-c119ec117f9f/admin/agents/fc72835a-e363-450b-a949-b3c73f0248ec:f446236f-d840-46a2-8e51-71f1ad0511e5" target="_blank" rel="noopener">5-20-2026-cargocats-dataservice-agent</a></td>
+              <td>Java</td>
+              <td>QA</td>
+              <td><code>6.33.1</code></td>
+              <td><code>6.34.0</code></td>
+              <td><span class="badge crit">Upgrade needed</span></td>
+              <td><a href="https://docs.contrastsecurity.com/en/java-agent-release-notes-and-archive.html" target="_blank" rel="noopener">Java notes ↗</a></td>
+            </tr>
+            <tr>
+              <td><a href="https://eval.contrastsecurity.com/Contrast/cs/index.html#/95a0c071-39b0-4495-b815-c119ec117f9f/admin/agents/a9fda4af-b4b0-4e54-a06e-a6bea8e42952:6d99376b-3234-4f70-9927-3a4588fd04a0" target="_blank" rel="noopener">5-20-2026-cargocats-reportservice-agent</a></td>
+              <td>Java</td>
+              <td>QA</td>
+              <td><code>6.33.1</code></td>
+              <td><code>6.34.0</code></td>
+              <td><span class="badge crit">Upgrade needed</span></td>
+              <td><a href="https://docs.contrastsecurity.com/en/java-agent-release-notes-and-archive.html" target="_blank" rel="noopener">Java notes ↗</a></td>
+            </tr>
+            <tr>
+              <td><a href="https://eval.contrastsecurity.com/Contrast/cs/index.html#/95a0c071-39b0-4495-b815-c119ec117f9f/admin/agents/8cc54c1b-2e2d-4059-b7e2-8ad4cf6bdb24:f337ea1f-80a3-468d-a731-ac3daafa2e38" target="_blank" rel="noopener">5-20-2026-cargocats-aiservice-agent</a></td>
+              <td>Java</td>
+              <td>QA</td>
+              <td><code>6.33.1</code></td>
+              <td><code>6.34.0</code></td>
+              <td><span class="badge crit">Upgrade needed</span></td>
+              <td><a href="https://docs.contrastsecurity.com/en/java-agent-release-notes-and-archive.html" target="_blank" rel="noopener">Java notes ↗</a></td>
+            </tr>
+            <tr>
+              <td><a href="https://eval.contrastsecurity.com/Contrast/cs/index.html#/95a0c071-39b0-4495-b815-c119ec117f9f/admin/agents/511a7960-8d20-4fe6-b607-be150bcf86d3:25306b84-30ae-4e1f-8ac3-dc8845c0eb65" target="_blank" rel="noopener">5-20-2026-cargocats-labelservice-agent</a></td>
+              <td>Node.js</td>
+              <td>QA</td>
+              <td><code>5.62.0</code></td>
+              <td><code>5.63.0</code></td>
+              <td><span class="badge crit">Upgrade needed</span></td>
+              <td><a href="https://docs.contrastsecurity.com/en/node-js-agent-release-notes-and-archive.html" target="_blank" rel="noopener">Node.js notes ↗</a></td>
+            </tr>
+            <tr>
+              <td><a href="https://eval.contrastsecurity.com/Contrast/cs/index.html#/95a0c071-39b0-4495-b815-c119ec117f9f/admin/agents/707821e7-f701-4881-b5a9-1e384a1b6bd0:01a01503-6003-7d51-b302-b50c0d1491a6" target="_blank" rel="noopener">5-20-2026-cargocats-webhookservice-agent</a></td>
+              <td>Python</td>
+              <td>QA</td>
+              <td><code>11.7.0</code></td>
+              <td><code>11.8.0</code></td>
+              <td><span class="badge crit">Upgrade needed</span></td>
+              <td><a href="https://docs.contrastsecurity.com/en/python-agent-release-notes-and-archive.html" target="_blank" rel="noopener">Python notes ↗</a></td>
+            </tr>
+            <tr>
+              <td><a href="https://eval.contrastsecurity.com/Contrast/cs/index.html#/95a0c071-39b0-4495-b815-c119ec117f9f/admin/agents/334e37b4-ef7c-412c-a780-00901a6bdd9f:01a01503-39e1-72f2-aa4b-299af25d8291" target="_blank" rel="noopener">5-20-2026-cargocats-docservice-agent</a></td>
+              <td>Python</td>
+              <td>QA</td>
+              <td><code>11.7.0</code></td>
+              <td><code>11.8.0</code></td>
+              <td><span class="badge crit">Upgrade needed</span></td>
+              <td><a href="https://docs.contrastsecurity.com/en/python-agent-release-notes-and-archive.html" target="_blank" rel="noopener">Python notes ↗</a></td>
+            </tr>
+            <tr>
+              <td><a href="https://eval.contrastsecurity.com/Contrast/cs/index.html#/95a0c071-39b0-4495-b815-c119ec117f9f/admin/agents/2f9320ae-191c-419e-97ac-cdf685050406:01a01503-4579-7b43-88fa-7a61ef702b07" target="_blank" rel="noopener">5-20-2026-cargocats-imageservice-agent</a></td>
+              <td>.NET Core</td>
+              <td>QA</td>
+              <td><code>60.1.2.0</code></td>
+              <td><code>60.1.2</code></td>
+              <td><span class="badge ok">Compliant</span></td>
+              <td><a href="https://docs.contrastsecurity.com/en/-net-agent-release-notes-and-archive.html" target="_blank" rel="noopener">.NET notes ↗</a></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="banner crit">
+        <span class="ico">📌</span>
+        <div>
+          <h2>Priority Action</h2>
+          <p>Upgrade Java servers from <code>6.33.1</code> to <code>6.34.0</code>, Node.js from <code>5.62.0</code> to <code>5.63.0</code>, and Python from <code>11.7.0</code> to <code>11.8.0</code>. That brings the fleet to full known-version compliance.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site">
+    <p>Generated with the <strong>Contrast Security MCP Server</strong> · <a href="https://docs.contrastsecurity.com/en/release.html" target="_blank" rel="noopener">Contrast release news ↗</a></p>
+    <p style="margin-top:8px">Last updated August 18, 2026 · Built with GPT-5.3-Codex</p>
+  </footer>
+</div>
+<script src="assets/theme.js"></script>
+<script>
+Chart.defaults.color = 'rgba(238,241,255,0.7)';
+Chart.defaults.font.family = "Inter, system-ui, sans-serif";
+
+new Chart(document.getElementById('complianceChart'), {
+  type: 'doughnut',
+  data: {
+    labels: ['Compliant','Needs upgrade','Unknown'],
+    datasets: [{
+      data: [1,7,0],
+      backgroundColor: ['#34e2a8','#ff4d6d','#ffcf4d'],
+      borderWidth: 0,
+      hoverOffset: 10
+    }]
+  },
+  options: {
+    cutout: '62%',
+    plugins: {
+      legend: { position: 'bottom', labels: { usePointStyle: true, padding: 18 } }
+    }
+  }
+});
+
+new Chart(document.getElementById('techChart'), {
+  type: 'bar',
+  data: {
+    labels: ['Java','Node.js','Python','.NET Core'],
+    datasets: [
+      { label: 'Needs upgrade', data: [4,1,2,0], backgroundColor: '#ff4d6d', borderRadius: 6 },
+      { label: 'Compliant', data: [0,0,0,1], backgroundColor: '#34e2a8', borderRadius: 6 },
+      { label: 'Unknown', data: [0,0,0,0], backgroundColor: '#ffcf4d', borderRadius: 6 }
+    ]
+  },
+  options: {
+    scales: {
+      x: { stacked: true, grid: { display: false } },
+      y: { stacked: true, beginAtZero: true, ticks: { stepSize: 1 }, grid: { color: 'rgba(124,142,255,0.1)' } }
+    },
+    plugins: {
+      legend: { position: 'bottom', labels: { usePointStyle: true, padding: 16 } }
+    }
+  }
+});
+</script>
+</body>
+</html>
